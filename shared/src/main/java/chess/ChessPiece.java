@@ -74,18 +74,40 @@ public class ChessPiece {
             // Move up and to the right
             while (currentRow < 8 && currentCol < 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol + 1);
-                ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
-                possibleMoves.add(possibleMove);
+                if (board.getPiece(newPosition) == null) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+                else if (pieceColor != board.getPiece(newPosition).pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                    break;
+                }
+                else {
+                    break;
+                }
                 currentRow++;
                 currentCol++;
+                }
+
             }
             currentRow = myPosition.getRow();
             currentCol = myPosition.getColumn();
             // Move down and to the right
             while (currentRow > 1 && currentCol < 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol + 1);
-                ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
-                possibleMoves.add(possibleMove);
+                if (board.getPiece(newPosition) == null) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+                else if (pieceColor != board.getPiece(newPosition).pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                    break;
+                }
+                else {
+                    break;
+                }
                 currentRow--;
                 currentCol++;
             }
@@ -94,8 +116,18 @@ public class ChessPiece {
             // Move down and to the left
             while (currentRow > 1 && currentCol > 1) {
                 ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol - 1);
-                ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
-                possibleMoves.add(possibleMove);
+                if (board.getPiece(newPosition) == null) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+                else if (pieceColor != board.getPiece(newPosition).pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                    break;
+                }
+                else {
+                    break;
+                }
                 currentRow--;
                 currentCol--;
             }
@@ -104,12 +136,21 @@ public class ChessPiece {
             // Move up and to the left
             while (currentRow < 8 && currentCol > 1) {
                 ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol - 1);
-                ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
-                possibleMoves.add(possibleMove);
+                if (board.getPiece(newPosition) == null) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+                else if (pieceColor != board.getPiece(newPosition).pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                    break;
+                }
+                else {
+                    break;
+                }
                 currentRow++;
                 currentCol--;
             }
-        }
         return possibleMoves;
     }
 }
