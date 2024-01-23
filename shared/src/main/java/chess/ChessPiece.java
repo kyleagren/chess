@@ -90,7 +90,7 @@ public class ChessPiece {
                 currentCol++;
                 }
 
-            }
+
             currentRow = myPosition.getRow();
             currentCol = myPosition.getColumn();
             // Move down and to the right
@@ -151,6 +151,74 @@ public class ChessPiece {
                 currentRow++;
                 currentCol--;
             }
+        }
+        else if (type == PieceType.KING) {
+            // Move up
+            if (currentRow < 8) {
+                ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
+                if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            // Move up and right
+            if (currentRow < 8 && currentCol < 8) {
+                ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol + 1);
+                if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            // Move right
+            if (currentCol < 8) {
+                ChessPosition newPosition = new ChessPosition(currentRow, currentCol + 1);
+                if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            // Move down and right
+            if (currentRow > 1 && currentCol < 8) {
+                ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol + 1);
+                if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            // Move down
+            if (currentRow > 1) {
+                ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol);
+                if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            // Move down and left
+            if (currentRow > 1 && currentCol > 1) {
+                ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol - 1);
+                if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            // Move left
+            if (currentCol > 1) {
+                ChessPosition newPosition = new ChessPosition(currentRow, currentCol - 1);
+                if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            // Move left and up
+            if (currentRow < 8 && currentCol > 1) {
+                ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol - 1);
+                if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+        }
         return possibleMoves;
     }
+
 }
