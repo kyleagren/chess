@@ -284,6 +284,79 @@ public class ChessPiece {
                 }
             }
         }
+        else if (type == PieceType.PAWN) {
+            // White side moves
+            // Move forward two if it hasn't moved yet
+            if (currentRow == 2 && pieceColor == ChessGame.TeamColor.WHITE) {
+                ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
+                if (board.getPiece(newPosition) == null) {
+                    newPosition = new ChessPosition(currentRow + 2, currentCol);
+                    if (board.getPiece(newPosition) == null) {
+                        ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                        possibleMoves.add(possibleMove);
+                    }
+                }
+            }
+            // Move forward one if it has already moved
+            else if (currentRow > 2 && currentRow < 7 && pieceColor == ChessGame.TeamColor.WHITE) {
+                ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
+                if (board.getPiece(newPosition) == null) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            // If we reach the opposite side, include promotion piece
+            else if (currentRow == 7 && pieceColor == ChessGame.TeamColor.WHITE) {
+                ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
+                if (board.getPiece(newPosition) == null) {
+                    ChessMove possibleMove1 = new ChessMove(myPosition, newPosition, PieceType.BISHOP);
+                    possibleMoves.add(possibleMove1);
+                    ChessMove possibleMove2 = new ChessMove(myPosition, newPosition, PieceType.KNIGHT);
+                    possibleMoves.add(possibleMove2);
+                    ChessMove possibleMove3 = new ChessMove(myPosition, newPosition, PieceType.ROOK);
+                    possibleMoves.add(possibleMove3);
+                    ChessMove possibleMove4 = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
+                    possibleMoves.add(possibleMove4);
+                }
+            }
+            // Move diagonal one if a piece can be captured
+
+            // Black side moves
+            // Move forward(down) two if it hasn't moved yet
+            if (currentRow == 7 && pieceColor == ChessGame.TeamColor.BLACK) {
+                ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol);
+                if (board.getPiece(newPosition) == null) {
+                    newPosition = new ChessPosition(currentRow - 2, currentCol);
+                    if (board.getPiece(newPosition) == null) {
+                        ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                        possibleMoves.add(possibleMove);
+                    }
+                }
+            }
+            // Move forward(down) one if it has already moved
+            else if (currentRow < 7 && currentRow > 2 && pieceColor == ChessGame.TeamColor.BLACK) {
+                ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol);
+                if (board.getPiece(newPosition) == null) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            // If we reach the opposite side, include promotion piece
+            else if (currentRow == 2 && pieceColor == ChessGame.TeamColor.BLACK) {
+                ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol);
+                if (board.getPiece(newPosition) == null) {
+                    ChessMove possibleMove1 = new ChessMove(myPosition, newPosition, PieceType.BISHOP);
+                    possibleMoves.add(possibleMove1);
+                    ChessMove possibleMove2 = new ChessMove(myPosition, newPosition, PieceType.KNIGHT);
+                    possibleMoves.add(possibleMove2);
+                    ChessMove possibleMove3 = new ChessMove(myPosition, newPosition, PieceType.ROOK);
+                    possibleMoves.add(possibleMove3);
+                    ChessMove possibleMove4 = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
+                    possibleMoves.add(possibleMove4);
+                }
+            }
+            // Move diagonal one if a piece can be captured
+        }
         return possibleMoves;
     }
 
