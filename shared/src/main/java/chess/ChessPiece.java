@@ -70,7 +70,7 @@ public class ChessPiece {
         ArrayList<ChessMove> possibleMoves = new ArrayList<>();
         int currentRow = myPosition.getRow();
         int currentCol = myPosition.getColumn();
-        if (type == PieceType.BISHOP) {
+        if (type == PieceType.QUEEN || type == PieceType.BISHOP) {
             // Move up and to the right
             while (currentRow < 8 && currentCol < 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol + 1);
@@ -151,8 +151,10 @@ public class ChessPiece {
                 currentRow++;
                 currentCol--;
             }
+            currentRow = myPosition.getRow();
+            currentCol = myPosition.getColumn();
         }
-        else if (type == PieceType.KING) {
+        if (type == PieceType.KING) {
             // Move up
             if (currentRow < 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
@@ -218,7 +220,7 @@ public class ChessPiece {
                 }
             }
         }
-        else if (type == PieceType.KNIGHT) {
+        if (type == PieceType.KNIGHT) {
             // Move up 2 and right 1
             if (currentRow < 7 && currentCol < 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow + 2, currentCol + 1);
@@ -284,7 +286,7 @@ public class ChessPiece {
                 }
             }
         }
-        else if (type == PieceType.PAWN) {
+        if (type == PieceType.PAWN) {
             // White side moves
             // Move forward one or two if it hasn't moved yet
             if (currentRow == 2 && pieceColor == ChessGame.TeamColor.WHITE) {
@@ -433,7 +435,7 @@ public class ChessPiece {
                 }
             }
         }
-        else if (type == PieceType.ROOK) {
+        if (type == PieceType.QUEEN || type == PieceType.ROOK) {
             // Move up
             while (currentRow < 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
@@ -508,7 +510,11 @@ public class ChessPiece {
                 }
                 currentCol--;
             }
+            currentRow = myPosition.getRow();
+            currentCol = myPosition.getColumn();
         }
+        // instead of "else if queen" logic here I want to try to put it as an or in rook / bishop moves since the
+        // queen is basically just a rook and a bishop.
         return possibleMoves;
     }
 
