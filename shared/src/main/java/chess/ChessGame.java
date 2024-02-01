@@ -89,29 +89,20 @@ public class ChessGame {
         if (piece.pieceMoves(board, start).isEmpty()) {
             throw new InvalidMoveException();
         }
-        for (ChessMove possibleMove : piece.pieceMoves(board, start)) {
-            if (move == possibleMove) {
-                if (board.getPiece(end) != null) {
-                    replacedPiece = board.getPiece(end);
-                }
-                board.addPiece(end, piece);
-                board.addPiece(start, null);
-            }
+        if (board.getPiece(end) != null) {
+            replacedPiece = board.getPiece(end);
         }
+        board.addPiece(end, piece);
+        board.addPiece(start, null);
     }
 
     public void unMakeMove(ChessMove move) {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
-        ChessPiece piece = board.getPiece(start);
+        ChessPiece piece = board.getPiece(end);
         board.addPiece(start, piece);
-        if (replacedPiece != null) {
-            board.addPiece(end, replacedPiece);
-            replacedPiece = null;
-        }
-        else {
-            board.addPiece(end, null);
-        }
+        board.addPiece(end, replacedPiece);
+
     }
 
     /**
