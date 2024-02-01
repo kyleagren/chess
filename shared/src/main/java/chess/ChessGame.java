@@ -92,8 +92,14 @@ public class ChessGame {
         if (board.getPiece(end) != null) {
             replacedPiece = board.getPiece(end);
         }
-        board.addPiece(end, piece);
-        board.addPiece(start, null);
+        for (ChessMove pieceMove : piece.pieceMoves(board, start)) {
+            if (move.equals(pieceMove)) {
+                board.addPiece(end, piece);
+                board.addPiece(start, null);
+                return;
+            }
+        }
+        throw new InvalidMoveException();
     }
 
     public void unMakeMove(ChessMove move) {
