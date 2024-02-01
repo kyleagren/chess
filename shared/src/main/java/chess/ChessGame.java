@@ -99,6 +99,11 @@ public class ChessGame {
                     board.addPiece(end, piece);
                 }
                 board.addPiece(start, null);
+
+                if (isInCheck(piece.getTeamColor())) {
+                    throw new InvalidMoveException();
+                }
+
                 if (getTeamTurn() == TeamColor.WHITE) {
                     setTeamTurn(TeamColor.BLACK);
                 }
@@ -134,7 +139,7 @@ public class ChessGame {
                 if (currentPiece.getTeamColor() != teamColor) {
                     ArrayList<ChessMove> oppositePieceMoves = new ArrayList<>(currentPiece.pieceMoves(board, new ChessPosition(row, column)));
                     for (ChessMove oppositeMove : oppositePieceMoves) {
-                        if (oppositeMove.getEndPosition() == board.getKingPosition(teamColor)) {
+                        if (oppositeMove.getEndPosition().equals(board.getKingPosition(teamColor))) {
                             return true;
                         }
                     }
