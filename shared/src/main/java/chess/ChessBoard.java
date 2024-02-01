@@ -49,6 +49,23 @@ public class ChessBoard {
     }
 
     /**
+     * Gets the position for the king for the specified team. Used to determine if a move would leave the king in check
+     * @param color The color (team) of the desired king
+     * @return The position that the king is currently located at
+     */
+    public ChessPosition getKingPosition(ChessGame.TeamColor color) {
+        for (int i = 0; i < squares.length; i++) {
+            for (int j = 0; j < squares[i].length; j++) {
+                ChessPiece piece = squares[i][j];
+                if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == color) {
+                    return new ChessPosition(i, j);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
