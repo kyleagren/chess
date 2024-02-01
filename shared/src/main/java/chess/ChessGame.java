@@ -67,7 +67,7 @@ public class ChessGame {
             try {
                 makeMove(move);
                 if (!isInCheck(color)) {validMoves.add(move);}
-                unMakeMove(move);
+                unMakeMove(move, piece.getPieceType(), color);
             }
             catch(InvalidMoveException e) {
                 System.out.print(e.getMessage());
@@ -94,7 +94,12 @@ public class ChessGame {
         }
         for (ChessMove pieceMove : piece.pieceMoves(board, start)) {
             if (move.equals(pieceMove)) {
-                board.addPiece(end, piece);
+                if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (piece.getTeamColor() == TeamColor.WHITE && end.getRow() == 8 || piece.getTeamColor() == TeamColor.BLACK && end.getRow() == 1)) {
+                    board.addPiece(end, new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+                }
+                else {
+                    board.addPiece(end, piece);
+                }
                 board.addPiece(start, null);
                 return;
             }
@@ -102,13 +107,11 @@ public class ChessGame {
         throw new InvalidMoveException();
     }
 
-    public void unMakeMove(ChessMove move) {
+    public void unMakeMove(ChessMove move, ChessPiece.PieceType type, TeamColor color) {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
-        ChessPiece piece = board.getPiece(end);
-        board.addPiece(start, piece);
+        board.addPiece(start, new ChessPiece(color, type));
         board.addPiece(end, replacedPiece);
-
     }
 
     /**
