@@ -324,7 +324,7 @@ public class ChessPiece {
                 }
             }
             // Move diagonal one if a piece can be captured
-            if (currentRow < 7 && pieceColor == ChessGame.TeamColor.WHITE) {
+            if (currentRow < 7 && currentCol > 1 && currentCol < 8 && pieceColor == ChessGame.TeamColor.WHITE) {
                 ChessPosition newPosition1 = new ChessPosition(currentRow + 1, currentCol - 1);
                 ChessPosition newPosition2 = new ChessPosition(currentRow + 1, currentCol + 1);
                 if (board.getPiece(newPosition1) != null && board.getPiece(newPosition1).getTeamColor() != pieceColor) {
@@ -336,7 +336,7 @@ public class ChessPiece {
                     possibleMoves.add(possibleMove);
                 }
             }
-            if (currentRow == 7 && pieceColor == ChessGame.TeamColor.WHITE) {
+            if (currentRow == 7 && currentCol > 1 && currentCol < 8 && pieceColor == ChessGame.TeamColor.WHITE) {
                 ChessPosition newPosition1 = new ChessPosition(currentRow + 1, currentCol - 1);
                 ChessPosition newPosition2 = new ChessPosition(currentRow + 1, currentCol + 1);
                 if (board.getPiece(newPosition1) != null && board.getPiece(newPosition1).getTeamColor() != pieceColor) {
@@ -398,7 +398,7 @@ public class ChessPiece {
                 }
             }
             // Move diagonal one if a piece can be captured
-            if (currentRow > 2 && pieceColor == ChessGame.TeamColor.BLACK) {
+            if (currentRow > 2 && currentCol > 1 && currentCol < 8 && pieceColor == ChessGame.TeamColor.BLACK) {
                 ChessPosition newPosition1 = new ChessPosition(currentRow - 1, currentCol - 1);
                 ChessPosition newPosition2 = new ChessPosition(currentRow - 1, currentCol + 1);
                 if (board.getPiece(newPosition1) != null && board.getPiece(newPosition1).getTeamColor() != pieceColor) {
@@ -410,7 +410,7 @@ public class ChessPiece {
                     possibleMoves.add(possibleMove);
                 }
             }
-            if (currentRow == 2 && pieceColor == ChessGame.TeamColor.BLACK) {
+            if (currentRow == 2 && currentCol > 1 && currentCol < 8 && pieceColor == ChessGame.TeamColor.BLACK) {
                 ChessPosition newPosition1 = new ChessPosition(currentRow - 1, currentCol - 1);
                 ChessPosition newPosition2 = new ChessPosition(currentRow - 1, currentCol + 1);
                 if (board.getPiece(newPosition1) != null && board.getPiece(newPosition1).getTeamColor() != pieceColor) {
