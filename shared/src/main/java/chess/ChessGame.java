@@ -31,12 +31,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        if (teamTurn == TeamColor.WHITE) {
-            teamTurn = TeamColor.BLACK;
-        }
-        else {
-            teamTurn = TeamColor.WHITE;
-        }
+        teamTurn = team;
     }
 
     /**
@@ -86,6 +81,9 @@ public class ChessGame {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
         ChessPiece piece = board.getPiece(start);
+        if (piece.getTeamColor() != getTeamTurn()) {
+            throw new InvalidMoveException();
+        }
         if (piece.pieceMoves(board, start).isEmpty()) {
             throw new InvalidMoveException();
         }
@@ -101,6 +99,12 @@ public class ChessGame {
                     board.addPiece(end, piece);
                 }
                 board.addPiece(start, null);
+                if (getTeamTurn() == TeamColor.WHITE) {
+                    setTeamTurn(TeamColor.BLACK);
+                }
+                else {
+                    setTeamTurn((TeamColor.WHITE));
+                };
                 return;
             }
         }
@@ -121,8 +125,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        for (int row = 0; row < 8; row++) {
-            for (int column = 0; column < 8; column++) {
+        for (int row = 1; row <= 8; row++) {
+            for (int column = 1; column <= 8; column++) {
                 ChessPiece currentPiece = board.getPiece(new ChessPosition(row, column));
                 if (currentPiece == null) {
                     continue;
