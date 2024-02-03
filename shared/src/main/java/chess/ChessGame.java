@@ -11,11 +11,10 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    private TeamColor teamTurn = TeamColor.WHITE;
+    private TeamColor teamTurn;
     private ChessBoard board;
-    private ChessPiece replacedPiece = null;
     public ChessGame() {
-
+        teamTurn = TeamColor.WHITE;
     }
 
     /**
@@ -51,7 +50,6 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ArrayList<ChessMove> validMoves = new ArrayList<>();
-
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null) {
             return null;
@@ -59,12 +57,20 @@ public class ChessGame {
         TeamColor color = piece.getTeamColor();
         ArrayList<ChessMove> possibleMoves = new ArrayList<>(piece.pieceMoves(board, startPosition));
         for (ChessMove move : possibleMoves) {
-            try {
-                makeMove(move);
-                if (!isInCheck(color)) {validMoves.add(move);}
-                unMakeMove(move, piece.getPieceType(), color);
+            ChessPosition end = move.getEndPosition();
+            ChessBoard boardBeforeMoves = new ChessBoard(board);
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (piece.getTeamColor() == TeamColor.WHITE && end.getRow() == 8 || piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getTeamColor() == TeamColor.BLACK && end.getRow() == 1)) {
+                board.addPiece(end, new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
             }
-            catch(InvalidMoveException ignored) {}
+            else {
+                board.addPiece(end, piece);
+            }
+            board.addPiece(startPosition, null);
+
+            if (!isInCheck(color)) {
+                validMoves.add(move);
+            }
+            board = new ChessBoard(boardBeforeMoves);
         }
         return validMoves;
     }
@@ -79,19 +85,15 @@ public class ChessGame {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
         ChessPiece piece = board.getPiece(start);
-        boolean moveIsCapture = false;
         if (piece.getTeamColor() != getTeamTurn()) {
             throw new InvalidMoveException();
         }
         if (piece.pieceMoves(board, start).isEmpty()) {
             throw new InvalidMoveException();
         }
-        if (board.getPiece(end) != null) {
-            moveIsCapture = true;
-            replacedPiece = board.getPiece(end);
-        }
-        for (ChessMove pieceMove : piece.pieceMoves(board, start)) {
-            if (move.equals(pieceMove)) {
+        // if this move is in validMoves, it makes the move, otherwise it throws an error
+        for (ChessMove validMove: validMoves(start)) {
+            if (move.equals(validMove)) {
                 if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (piece.getTeamColor() == TeamColor.WHITE && end.getRow() == 8 || piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getTeamColor() == TeamColor.BLACK && end.getRow() == 1)) {
                     board.addPiece(end, new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
                 }
@@ -99,12 +101,6 @@ public class ChessGame {
                     board.addPiece(end, piece);
                 }
                 board.addPiece(start, null);
-
-                if (isInCheck(piece.getTeamColor())) {
-                    unMakeMove(move, piece.getPieceType(), piece.getTeamColor(), moveIsCapture);
-                    throw new InvalidMoveException();
-                }
-
                 if (getTeamTurn() == TeamColor.WHITE) {
                     setTeamTurn(TeamColor.BLACK);
                 }
@@ -115,41 +111,6 @@ public class ChessGame {
             }
         }
         throw new InvalidMoveException();
-    }
-
-    /**
-     * Reverses a move in a chess game
-     *
-     * @param move chess move to preform
-     * @param type type of the moved piece
-     * @param color color of the moved piece
-     */
-    public void unMakeMove(ChessMove move, ChessPiece.PieceType type, TeamColor color) {
-        ChessPosition start = move.getStartPosition();
-        ChessPosition end = move.getEndPosition();
-        board.addPiece(start, new ChessPiece(color, type));
-        board.addPiece(end, replacedPiece);
-    }
-
-    /**
-     * Overloads unMakeMove function to allow an isCapture param
-     * Reverses a move in a chess game
-     *
-     * @param move chess move to preform
-     * @param type type of the moved piece
-     * @param color color of the moved piece
-     * @param isCapture boolean that is true if the move that we are reversing resulted in a capture
-     */
-    public void unMakeMove(ChessMove move, ChessPiece.PieceType type, TeamColor color, boolean isCapture) {
-        ChessPosition start = move.getStartPosition();
-        ChessPosition end = move.getEndPosition();
-        board.addPiece(start, new ChessPiece(color, type));
-        if (isCapture) {
-            board.addPiece(end, replacedPiece);
-        }
-        else {
-            board.addPiece(end, null);
-        }
     }
 
     /**

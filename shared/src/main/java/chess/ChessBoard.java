@@ -22,11 +22,23 @@ public class ChessBoard {
         return Arrays.deepHashCode(squares);
     }
 
-    private final ChessPiece[][] squares = new ChessPiece[8][8];
+    private ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {
 
     }
-
+    public ChessBoard(ChessBoard board) {
+        this.squares = new ChessPiece[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (board.squares[i][j] == null) {
+                    this.squares[i][j] = null;
+                }
+                else {
+                    this.squares[i][j] = new ChessPiece(board.squares[i][j]);
+                }
+            }
+        }
+    }
     /**
      * Adds a chess piece to the chessboard
      *
