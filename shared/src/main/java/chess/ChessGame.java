@@ -64,9 +64,7 @@ public class ChessGame {
                 if (!isInCheck(color)) {validMoves.add(move);}
                 unMakeMove(move, piece.getPieceType(), color);
             }
-            catch(InvalidMoveException e) {
-                System.out.print(e.getMessage());
-            }
+            catch(InvalidMoveException ignored) {}
         }
         return validMoves;
     }
@@ -119,6 +117,13 @@ public class ChessGame {
         throw new InvalidMoveException();
     }
 
+    /**
+     * Reverses a move in a chess game
+     *
+     * @param move chess move to preform
+     * @param type type of the moved piece
+     * @param color color of the moved piece
+     */
     public void unMakeMove(ChessMove move, ChessPiece.PieceType type, TeamColor color) {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
@@ -126,6 +131,15 @@ public class ChessGame {
         board.addPiece(end, replacedPiece);
     }
 
+    /**
+     * Overloads unMakeMove function to allow an isCapture param
+     * Reverses a move in a chess game
+     *
+     * @param move chess move to preform
+     * @param type type of the moved piece
+     * @param color color of the moved piece
+     * @param isCapture boolean that is true if the move that we are reversing resulted in a capture
+     */
     public void unMakeMove(ChessMove move, ChessPiece.PieceType type, TeamColor color, boolean isCapture) {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
@@ -171,7 +185,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
+        return isInCheck(teamColor) && isInStalemate(teamColor);
     }
 
     /**
@@ -182,7 +197,29 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        var possibleMoves = new ArrayList<ChessMove>();
+        for (int row = 1; row <= 8; row++) {
+            for (int column = 1; column <= 8; column++) {
+                ChessPosition currentPosition = new ChessPosition(row, column);
+                ChessPiece currentPiece = board.getPiece(currentPosition);
+                if (currentPiece == null) {
+                    continue;
+                }
+                if (currentPiece.getTeamColor() == teamColor) {
+                    possibleMoves.addAll(validMoves(currentPosition));
+                }
+            }
+        }
+        if (possibleMoves.isEmpty()) {
+            if (getTeamTurn() == TeamColor.WHITE) {
+                setTeamTurn(TeamColor.BLACK);
+            }
+            else {
+                setTeamTurn((TeamColor.WHITE));
+            };
+            return true;
+        }
+        return false;
     }
 
     /**
