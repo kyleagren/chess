@@ -81,6 +81,7 @@ public class ChessGame {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
         ChessPiece piece = board.getPiece(start);
+        boolean moveIsCapture = false;
         if (piece.getTeamColor() != getTeamTurn()) {
             throw new InvalidMoveException();
         }
@@ -88,11 +89,12 @@ public class ChessGame {
             throw new InvalidMoveException();
         }
         if (board.getPiece(end) != null) {
+            moveIsCapture = true;
             replacedPiece = board.getPiece(end);
         }
         for (ChessMove pieceMove : piece.pieceMoves(board, start)) {
             if (move.equals(pieceMove)) {
-                if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (piece.getTeamColor() == TeamColor.WHITE && end.getRow() == 8 || piece.getTeamColor() == TeamColor.BLACK && end.getRow() == 1)) {
+                if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (piece.getTeamColor() == TeamColor.WHITE && end.getRow() == 8 || piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getTeamColor() == TeamColor.BLACK && end.getRow() == 1)) {
                     board.addPiece(end, new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
                 }
                 else {
@@ -101,6 +103,7 @@ public class ChessGame {
                 board.addPiece(start, null);
 
                 if (isInCheck(piece.getTeamColor())) {
+                    unMakeMove(move, piece.getPieceType(), piece.getTeamColor(), moveIsCapture);
                     throw new InvalidMoveException();
                 }
 
@@ -121,6 +124,18 @@ public class ChessGame {
         ChessPosition end = move.getEndPosition();
         board.addPiece(start, new ChessPiece(color, type));
         board.addPiece(end, replacedPiece);
+    }
+
+    public void unMakeMove(ChessMove move, ChessPiece.PieceType type, TeamColor color, boolean isCapture) {
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        board.addPiece(start, new ChessPiece(color, type));
+        if (isCapture) {
+            board.addPiece(end, replacedPiece);
+        }
+        else {
+            board.addPiece(end, null);
+        }
     }
 
     /**
