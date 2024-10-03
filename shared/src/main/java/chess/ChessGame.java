@@ -14,6 +14,8 @@ public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard board;
     public ChessGame() {
+        this.board = new ChessBoard();
+        this.board.resetBoard();
         teamTurn = TeamColor.WHITE;
     }
 
@@ -85,6 +87,9 @@ public class ChessGame {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
         ChessPiece piece = board.getPiece(start);
+        if (piece == null) {
+            throw new InvalidMoveException();
+        }
         if (piece.getTeamColor() != getTeamTurn()) {
             throw new InvalidMoveException();
         }
@@ -106,7 +111,7 @@ public class ChessGame {
                 }
                 else {
                     setTeamTurn((TeamColor.WHITE));
-                };
+                }
                 return;
             }
         }
@@ -147,7 +152,41 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
 
-        return isInCheck(teamColor) && isInStalemate(teamColor);
+        return isInCheck(teamColor) && isInStalemateIgnoresCheck(teamColor);
+    }
+
+    /**
+     * Determines if the given team is in stalemate, which here is defined as having
+     * no valid moves
+     *
+     * @param teamColor which team to check for stalemate
+     * @return True if the specified team is in stalemate, otherwise false
+     */
+    public boolean isInStalemateIgnoresCheck(TeamColor teamColor) {
+        var possibleMoves = new ArrayList<ChessMove>();
+        for (int row = 1; row <= 8; row++) {
+            for (int column = 1; column <= 8; column++) {
+                ChessPosition currentPosition = new ChessPosition(row, column);
+                ChessPiece currentPiece = board.getPiece(currentPosition);
+                if (currentPiece == null) {
+                    continue;
+                }
+                if (currentPiece.getTeamColor() == teamColor) {
+                    possibleMoves.addAll(validMoves(currentPosition));
+                }
+            }
+        }
+        if (possibleMoves.isEmpty()) {
+            if (getTeamTurn() == TeamColor.WHITE) {
+                setTeamTurn(TeamColor.BLACK);
+            }
+            else {
+                setTeamTurn((TeamColor.WHITE));
+            }
+            return true;
+
+        }
+        return false;
     }
 
     /**
@@ -177,8 +216,8 @@ public class ChessGame {
             }
             else {
                 setTeamTurn((TeamColor.WHITE));
-            };
-            return true;
+            }
+            return !isInCheck(teamColor);
         }
         return false;
     }
