@@ -1,15 +1,17 @@
 package server;
 
 import com.google.gson.Gson;
+import model.AuthData;
 import model.UserData;
 import spark.*;
 import service.UserService;
 
 public class Handler {
     private final UserService userService = new UserService();
-    public void register(Request req, Response Res) {
-        var bodyObj = getBody(req, UserData.class);
-        userService.register(bodyObj);
+
+    public AuthData register(Request req, Response res) {
+        var userData = getBody(req, UserData.class);
+        return userService.register(userData);
     }
 
     private static <T> T getBody(Request request, Class<T> classType) {

@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import model.AuthData;
 import model.UserData;
 import spark.*;
 
@@ -24,8 +25,10 @@ public class Server {
     }
 
     public Object register(Request req, Response res) {
-        this.handler.register(req, res); // TODO is this the problem child? No handler = new Handler() anywhere
-        return null;
+        AuthData result = this.handler.register(req, res);
+        res.type("application/json");
+        System.out.print(result);
+        return new Gson().toJson(result);
     }
 
     public void stop() {
