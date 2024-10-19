@@ -25,10 +25,7 @@ public class Server {
     }
 
     public Object register(Request req, Response res) {
-        AuthData result = this.handler.register(req, res);
-        res.type("application/json");
-        System.out.print(result);
-        return new Gson().toJson(result);
+        return this.handler.register(req, res);
     }
 
     public void stop() {
