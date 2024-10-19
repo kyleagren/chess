@@ -7,4 +7,6 @@ public interface AuthDataAccess {
     void createAuth(AuthData data);
 
     boolean checkIfLoggedIn(String username);
+
+    void deleteAuth(String token) throws DataAccessException;
 }

@@ -5,6 +5,9 @@ import dataaccess.UserDataAccess;
 import dataaccess.UserDataAccessMemory;
 import model.AuthData;
 import model.UserData;
+import server.EmptySuccessResponse;
+
+import java.util.UUID;
 
 public class UserService {
     private final UserDataAccess userDataAccess = new UserDataAccessMemory();
@@ -54,5 +57,18 @@ public class UserService {
             throw new Exception("incorrect password");
         }
         return data;
+    }
+
+    public Object logout(String token) throws Exception {
+        try{
+            UUID uuid = UUID.fromString(token);
+            if (authService.getAuth(token) != null) {
+                authService.deleteAuth(token);
+                return new EmptySuccessResponse();
+            }
+        } catch (DataAccessException e){
+            throw new Exception(e.getMessage());
+        }
+        throw new Exception("something went wrong");
     }
 }

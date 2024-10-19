@@ -17,6 +17,7 @@ public class Server {
         // Register your endpoints and handle exceptions here
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -31,6 +32,10 @@ public class Server {
 
     public Object login(Request req, Response res) {
         return this.handler.login(req, res);
+    }
+
+    public Object logout(Request req, Response res) {
+        return this.handler.logout(req, res);
     }
 
     public void stop() {

@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import dataaccess.AuthDataAccess;
 
+import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class AuthService {
@@ -23,5 +24,13 @@ public class AuthService {
 
     public boolean checkIfLoggedIn(String username) {
         return authDataAccess.checkIfLoggedIn(username);
+    }
+
+    public void deleteAuth(String token) throws DataAccessException {
+            try {
+                authDataAccess.deleteAuth(token);
+            } catch (DataAccessException e) {
+                throw new DataAccessException(e.getMessage());
+            }
     }
 }

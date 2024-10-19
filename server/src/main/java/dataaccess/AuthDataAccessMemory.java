@@ -31,4 +31,19 @@ public class AuthDataAccessMemory implements AuthDataAccess {
         }
         return false;
     }
+
+    @Override
+    public void deleteAuth(String token) throws DataAccessException {
+        boolean found = false;
+        for (AuthData authData : authList) {
+            if (authData.authToken().equals(token)) {
+                authList.remove(authData);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new DataAccessException("not found");
+        }
+    }
 }
