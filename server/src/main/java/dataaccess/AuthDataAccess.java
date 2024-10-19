@@ -6,4 +6,5 @@ public interface AuthDataAccess {
     AuthData getAuth(String token);
     void createAuth(AuthData data);
 
+    boolean checkIfLoggedIn(String username);
 }

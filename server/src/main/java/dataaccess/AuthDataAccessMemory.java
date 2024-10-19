@@ -21,4 +21,14 @@ public class AuthDataAccessMemory implements AuthDataAccess {
     public void createAuth(AuthData data) {
         authList.add(data);
     }
+
+    @Override
+    public boolean checkIfLoggedIn(String username) {
+        for (AuthData auth: authList) {
+            if (username.equals(auth.username())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
