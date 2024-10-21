@@ -113,7 +113,7 @@ public class Handler {
         String token = req.headers("Authorization");
         res.type("application/json");
         var gameData = getBody(req, JoinGameRequestBody.class);
-        if (gameData.gameID() <= 0 || !(gameData.playerColor().equals("WHITE") || gameData.playerColor().equals("BLACK"))) {
+        if (gameData.gameID() <= 0 || (gameData.playerColor() == null) ||!(gameData.playerColor().equals("WHITE") || gameData.playerColor().equals("BLACK"))) {
             res.status(400);
             ErrorResponse error = new ErrorResponse("Error: bad request");
             return new Gson().toJson(error);
