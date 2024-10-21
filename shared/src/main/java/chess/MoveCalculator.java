@@ -315,7 +315,7 @@ public class MoveCalculator {
        return possibleMoves;
    }
 
-    public ArrayList<ChessMove> calculatePawnMoves() {
+    public ArrayList<ChessMove> calculateWhitePawnMoves() {
         ArrayList<ChessMove> possibleMoves = new ArrayList<>();
 
         // White side moves
@@ -370,6 +370,12 @@ public class MoveCalculator {
                 possibleMoves.addAll(addAllPromotionPiecesForMove(newPosition2));
             }
         }
+
+        return possibleMoves;
+    }
+
+    public ArrayList<ChessMove> calculateBlackPawnMoves() {
+        ArrayList<ChessMove> possibleMoves = new ArrayList<>();
 
         // Black side moves
         // Move forward(down) one or two if it hasn't moved yet

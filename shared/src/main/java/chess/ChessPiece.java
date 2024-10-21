@@ -90,7 +90,8 @@ public class ChessPiece {
             possibleMoves.addAll(calculator.calculateKnightMoves());
         }
         if (type == PieceType.PAWN) {
-            possibleMoves.addAll(calculator.calculatePawnMoves());
+            possibleMoves.addAll(calculator.calculateWhitePawnMoves());
+            possibleMoves.addAll(calculator.calculateBlackPawnMoves());
         }
         return possibleMoves;
     }
