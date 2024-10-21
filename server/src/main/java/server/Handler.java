@@ -142,7 +142,7 @@ public class Handler {
         String token = req.headers("Authorization");
         res.type("application/json");
         try {
-            Object result = userService.logout(token);
+            Object result = gameService.getGames(token);
             return new Gson().toJson(result);
         } catch (Exception e) {
             if (e.getMessage().equals("not found")) {

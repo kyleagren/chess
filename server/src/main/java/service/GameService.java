@@ -6,6 +6,7 @@ import dataaccess.GameDataAccessMemory;
 import model.AuthData;
 import server.EmptySuccessResponse;
 import server.GameCreatedResponse;
+import server.GamesListResponse;
 
 public class GameService {
     private final GameDataAccess gameDataAccess = new GameDataAccessMemory();
@@ -42,6 +43,19 @@ public class GameService {
                     throw new Exception(e.getMessage());
                 }
                 return new EmptySuccessResponse();
+            }
+            else {
+                throw new Exception("not found");
+            }
+        } catch (DataAccessException e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public Object getGames(String token) throws Exception {
+        try {
+            if (authService.getAuth(token) != null) {
+                return new GamesListResponse(gameDataAccess.getGames());
             }
             else {
                 throw new Exception("not found");

@@ -12,7 +12,7 @@ public class GameDataAccessMemory implements GameDataAccess {
     public int createGame(String gameName) {
         int currentSize = games.size();
         ChessGame game = new ChessGame();
-        GameData gameRepresentation = new GameData(currentSize, null, null, gameName, game);
+        GameData gameRepresentation = new GameData(currentSize, "", "", gameName, game);
         games.add(gameRepresentation);
         return (currentSize);
     }
@@ -26,7 +26,6 @@ public class GameDataAccessMemory implements GameDataAccess {
         }
     }
 
-
     @Override
     public void joinGame(int gameID, String playerColor, String username) throws DataAccessException {
         GameData game = null;
@@ -37,21 +36,21 @@ public class GameDataAccessMemory implements GameDataAccess {
         }
         if (playerColor.equals("WHITE")) {
             GameData newGame;
-            if (game.blackUsername() != null) {
+            if (!game.blackUsername().isEmpty()) {
                 newGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
             }
             else {
-                newGame = new GameData(gameID, username, null, game.gameName(), game.game());
+                newGame = new GameData(gameID, username, "", game.gameName(), game.game());
             }
             games.set(gameID, newGame);
         }
         else if (playerColor.equals("BLACK")) {
             GameData newGame;
-            if (game.whiteUsername() != null) {
+            if (!game.whiteUsername().isEmpty()) {
                 newGame = new GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
             }
             else {
-                newGame = new GameData(gameID, null, username, game.gameName(), game.game());
+                newGame = new GameData(gameID, "", username, game.gameName(), game.game());
             }
             games.set(gameID, newGame);
         }
@@ -66,11 +65,16 @@ public class GameDataAccessMemory implements GameDataAccess {
             throw new DataAccessException(e.getMessage());
         }
         if (playerColor.equals("WHITE")) {
-            return game.whiteUsername() == null;
+            return game.whiteUsername().isEmpty();
         }
         else if (playerColor.equals("BLACK")) {
-            return game.blackUsername() == null;
+            return game.blackUsername().isEmpty();
         }
         throw new DataAccessException("invalid color provided");
+    }
+
+    @Override
+    public ArrayList<GameData> getGames() {
+        return games;
     }
 }
