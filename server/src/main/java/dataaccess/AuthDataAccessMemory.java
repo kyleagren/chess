@@ -5,7 +5,7 @@ import model.AuthData;
 import java.util.ArrayList;
 
 public class AuthDataAccessMemory implements AuthDataAccess {
-    private ArrayList<AuthData> authList = new ArrayList<>();
+    private static ArrayList<AuthData> authList = new ArrayList<>();
 
     @Override
     public AuthData getAuth(String token) {

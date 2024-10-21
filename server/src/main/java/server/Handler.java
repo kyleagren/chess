@@ -1,12 +1,15 @@
 package server;
 
 import com.google.gson.Gson;
+import model.GameData;
 import model.UserData;
+import service.GameService;
 import spark.*;
 import service.UserService;
 
 public class Handler {
     private final UserService userService = new UserService();
+    private final GameService gameService = new GameService();
 
     public Object register(Request req, Response res) {
         var userData = getBody(req, UserData.class);
@@ -77,6 +80,92 @@ public class Handler {
             return new Gson().toJson(error);
         }
     }
+    }
+
+    public Object createGame(Request req, Response res) {
+        String token = req.headers("Authorization");
+        res.type("application/json");
+        var gameData = getBody(req, GameData.class);
+        if (gameData.gameName() == null) {
+            res.status(400);
+            ErrorResponse error = new ErrorResponse("Error: bad request");
+            return new Gson().toJson(error);
+        }
+        try {
+            Object result = gameService.createGame(token, gameData.gameName());
+            return new Gson().toJson(result);
+        } catch (Exception e) {
+            if (e.getMessage().equals("not found")) {
+                res.status(401);
+                ErrorResponse error = new ErrorResponse("unauthorized");
+                return new Gson().toJson(error);
+            }
+            else {
+                res.status(500);
+                ErrorResponse error = new ErrorResponse("Error: " + e.getMessage());
+                return new Gson().toJson(error);
+            }
+        }
+    }
+
+    public Object joinGame(Request req, Response res) {
+        String token = req.headers("Authorization");
+        res.type("application/json");
+        try {
+            Object result = userService.logout(token);
+            return new Gson().toJson(result);
+        } catch (Exception e) {
+            if (e.getMessage().equals("not found")) {
+                res.status(401);
+                ErrorResponse error = new ErrorResponse("unauthorized");
+                return new Gson().toJson(error);
+            }
+            else {
+                res.status(500);
+                ErrorResponse error = new ErrorResponse("Error: " + e.getMessage());
+                return new Gson().toJson(error);
+            }
+        }
+    }
+
+    public Object listGames(Request req, Response res) {
+        String token = req.headers("Authorization");
+        res.type("application/json");
+        try {
+            Object result = userService.logout(token);
+            return new Gson().toJson(result);
+        } catch (Exception e) {
+            if (e.getMessage().equals("not found")) {
+                res.status(401);
+                ErrorResponse error = new ErrorResponse("unauthorized");
+                return new Gson().toJson(error);
+            }
+            else {
+                res.status(500);
+                ErrorResponse error = new ErrorResponse("Error: " + e.getMessage());
+                return new Gson().toJson(error);
+            }
+        }
+    }
+
+    public Object clear(Request req, Response res) {
+        String token = req.headers("Authorization");
+        res.type("application/json");
+        try {
+            Object result = userService.logout(token);
+            return new Gson().toJson(result);
+        } catch (Exception e) {
+            if (e.getMessage().equals("not found")) {
+                res.status(401);
+                ErrorResponse error = new ErrorResponse("unauthorized");
+                return new Gson().toJson(error);
+            }
+            else {
+                res.status(500);
+                ErrorResponse error = new ErrorResponse("Error: " + e.getMessage());
+                return new Gson().toJson(error);
+            }
+        }
     }
 
     private static <T> T getBody(Request request, Class<T> classType) {
