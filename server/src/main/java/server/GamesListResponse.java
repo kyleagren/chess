@@ -14,5 +14,7 @@ public class GamesListResponse {
             games.add(newData);
         }
     }
-
+    public  ArrayList<TruncatedGameData> listGames() {
+        return games;
+    }
 }
