@@ -13,7 +13,7 @@ public class UserService {
     private final UserDataAccess userDataAccess = new UserDataAccessMemory();
     private final AuthService authService = new AuthService();
 
-    public AuthData register(UserData userData) throws Exception{
+    public AuthData register(UserData userData) throws Exception {
         var username = userData.username();
         UserData user = userDataAccess.getUser(username);
         AuthData data;
@@ -44,9 +44,6 @@ public class UserService {
             throw new Exception("User does not exist");
         }
         if (password.equals(user.password())) {
-//            if (authService.checkIfLoggedIn(username)) {
-//                throw new Exception("already logged in");
-//            }
             try {
                 data = authService.createAuth(username);
             } catch (DataAccessException e) {
@@ -61,7 +58,7 @@ public class UserService {
 
     public Object logout(String token) throws Exception {
         try{
-            UUID uuid = UUID.fromString(token);
+            UUID.fromString(token);
             if (authService.getAuth(token) != null) {
                 authService.deleteAuth(token);
                 return new EmptySuccessResponse();

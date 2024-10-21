@@ -5,7 +5,7 @@ import model.AuthData;
 import java.util.ArrayList;
 
 public class AuthDataAccessMemory implements AuthDataAccess {
-    private static ArrayList<AuthData> authList = new ArrayList<>();
+    private static final ArrayList<AuthData> authList = new ArrayList<>();
 
     @Override
     public AuthData getAuth(String token) {
@@ -20,16 +20,6 @@ public class AuthDataAccessMemory implements AuthDataAccess {
     @Override
     public void createAuth(AuthData data) {
         authList.add(data);
-    }
-
-    @Override
-    public boolean checkIfLoggedIn(String username) {
-        for (AuthData auth: authList) {
-            if (username.equals(auth.username())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
