@@ -62,7 +62,6 @@ public class Handler {
     }
 
     public Object logout(Request req, Response res) {
-        // TODO currently lets you log out multiple times.
         String token = req.headers("Authorization");
         res.type("application/json");
         try {
@@ -111,13 +110,24 @@ public class Handler {
     public Object joinGame(Request req, Response res) {
         String token = req.headers("Authorization");
         res.type("application/json");
+        var gameData = getBody(req, JoinGameRequestBody.class);
+        if (gameData.gameID() < 0 || !(gameData.playerColor().equals("WHITE") || gameData.playerColor().equals("BLACK"))) {
+            res.status(400);
+            ErrorResponse error = new ErrorResponse("Error: bad request");
+            return new Gson().toJson(error);
+        }
         try {
-            Object result = userService.logout(token);
+            Object result = gameService.joinGame(token, gameData.gameID(), gameData.playerColor());
             return new Gson().toJson(result);
         } catch (Exception e) {
             if (e.getMessage().equals("not found")) {
                 res.status(401);
                 ErrorResponse error = new ErrorResponse("unauthorized");
+                return new Gson().toJson(error);
+            }
+            else if (e.getMessage().equals("already taken")) {
+                res.status(403);
+                ErrorResponse error = new ErrorResponse("already taken");
                 return new Gson().toJson(error);
             }
             else {

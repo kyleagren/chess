@@ -3,7 +3,7 @@ package dataaccess;
 import java.util.ArrayList;
 
 public class UserDataAccessMemory implements UserDataAccess {
-    private final ArrayList<model.UserData> userList = new ArrayList<>();
+    private static ArrayList<model.UserData> userList = new ArrayList<>();
 
     @Override
     public model.UserData getUser(String username) {
