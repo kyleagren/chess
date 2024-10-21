@@ -33,4 +33,8 @@ public class AuthService {
                 throw new DataAccessException(e.getMessage());
             }
     }
+
+    public void deleteAll() {
+        authDataAccess.deleteAll();
+    }
 }

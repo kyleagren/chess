@@ -77,4 +77,9 @@ public class GameDataAccessMemory implements GameDataAccess {
     public ArrayList<GameData> getGames() {
         return games;
     }
+
+    @Override
+    public void deleteAll() {
+        games.clear();
+    }
 }

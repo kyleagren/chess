@@ -46,4 +46,9 @@ public class AuthDataAccessMemory implements AuthDataAccess {
             throw new DataAccessException("not found");
         }
     }
+
+    @Override
+    public void deleteAll() {
+        authList.clear();
+    }
 }

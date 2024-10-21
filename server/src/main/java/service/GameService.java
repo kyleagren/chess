@@ -64,4 +64,8 @@ public class GameService {
             throw new Exception(e.getMessage());
         }
     }
+
+    public void deleteAll() {
+        gameDataAccess.deleteAll();
+    }
 }

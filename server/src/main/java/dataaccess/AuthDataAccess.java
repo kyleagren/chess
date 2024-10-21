@@ -9,4 +9,6 @@ public interface AuthDataAccess {
     boolean checkIfLoggedIn(String username);
 
     void deleteAuth(String token) throws DataAccessException;
+
+    void deleteAll();
 }

@@ -14,4 +14,6 @@ public interface GameDataAccess {
     boolean checkAvailability(int gameID, String playerColor) throws DataAccessException;
 
     ArrayList<GameData> getGames();
+
+    void deleteAll();
 }

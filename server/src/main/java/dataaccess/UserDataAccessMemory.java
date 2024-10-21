@@ -22,4 +22,9 @@ public class UserDataAccessMemory implements UserDataAccess {
         }
         else throw new DataAccessException("User already exists");
     }
+
+    @Override
+    public void deleteAll() {
+        userList.clear();
+    }
 }

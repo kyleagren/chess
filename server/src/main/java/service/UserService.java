@@ -71,4 +71,8 @@ public class UserService {
         }
         throw new Exception("something went wrong");
     }
+
+    public void deleteAll() {
+        userDataAccess.deleteAll();
+    }
 }
