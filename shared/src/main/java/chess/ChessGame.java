@@ -61,7 +61,10 @@ public class ChessGame {
         for (ChessMove move : possibleMoves) {
             ChessPosition end = move.getEndPosition();
             ChessBoard boardBeforeMoves = new ChessBoard(board);
-            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (piece.getTeamColor() == TeamColor.WHITE && end.getRow() == 8 || piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getTeamColor() == TeamColor.BLACK && end.getRow() == 1)) {
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                    (piece.getTeamColor() == TeamColor.WHITE &&
+                            end.getRow() == 8 || piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                            piece.getTeamColor() == TeamColor.BLACK && end.getRow() == 1)) {
                 board.addPiece(end, new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
             }
             else {
@@ -99,7 +102,10 @@ public class ChessGame {
         // if this move is in validMoves, it makes the move, otherwise it throws an error
         for (ChessMove validMove: validMoves(start)) {
             if (move.equals(validMove)) {
-                if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (piece.getTeamColor() == TeamColor.WHITE && end.getRow() == 8 || piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getTeamColor() == TeamColor.BLACK && end.getRow() == 1)) {
+                if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                        (piece.getTeamColor() == TeamColor.WHITE &&
+                                end.getRow() == 8 || piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                                piece.getTeamColor() == TeamColor.BLACK && end.getRow() == 1)) {
                     board.addPiece(end, new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
                 }
                 else {

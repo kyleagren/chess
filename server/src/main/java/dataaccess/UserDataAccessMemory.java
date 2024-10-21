@@ -20,7 +20,9 @@ public class UserDataAccessMemory implements UserDataAccess {
         if (getUser(userData.username()) == null) {
             userList.add(userData);
         }
-        else throw new DataAccessException("User already exists");
+        else {
+            throw new DataAccessException("User already exists");
+        }
     }
 
     @Override
