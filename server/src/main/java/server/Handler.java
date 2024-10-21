@@ -96,16 +96,7 @@ public class Handler {
             Object result = gameService.createGame(token, gameData.gameName());
             return new Gson().toJson(result);
         } catch (Exception e) {
-            if (e.getMessage().equals("not found")) {
-                res.status(401);
-                ErrorResponse error = new ErrorResponse("Error: unauthorized");
-                return new Gson().toJson(error);
-            }
-            else {
-                res.status(500);
-                ErrorResponse error = new ErrorResponse("Error: " + e.getMessage());
-                return new Gson().toJson(error);
-            }
+            return exceptionHandler(e, res);
         }
     }
 
@@ -148,16 +139,20 @@ public class Handler {
             Object result = gameService.getGames(token);
             return new Gson().toJson(result);
         } catch (Exception e) {
-            if (e.getMessage().equals("not found")) {
-                res.status(401);
-                ErrorResponse error = new ErrorResponse("Error: unauthorized");
-                return new Gson().toJson(error);
-            }
-            else {
-                res.status(500);
-                ErrorResponse error = new ErrorResponse("Error: " + e.getMessage());
-                return new Gson().toJson(error);
-            }
+            return exceptionHandler(e, res);
+        }
+    }
+
+    private Object exceptionHandler(Exception e, Response res) {
+        if (e.getMessage().equals("not found")) {
+            res.status(401);
+            ErrorResponse error = new ErrorResponse("Error: unauthorized");
+            return new Gson().toJson(error);
+        }
+        else {
+            res.status(500);
+            ErrorResponse error = new ErrorResponse("Error: " + e.getMessage());
+            return new Gson().toJson(error);
         }
     }
 
