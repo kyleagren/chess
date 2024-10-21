@@ -11,7 +11,7 @@ public class AuthServiceTests {
 
     private static AuthData expectedAuth;
 
-    private static final String uuid = UUID.randomUUID().toString();
+    private static String uuid = UUID.randomUUID().toString();
 
     @BeforeAll
     public static void init() {

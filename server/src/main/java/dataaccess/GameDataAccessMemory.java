@@ -6,7 +6,7 @@ import model.GameData;
 import java.util.ArrayList;
 
 public class GameDataAccessMemory implements GameDataAccess {
-    private static final ArrayList<GameData> games = new ArrayList<>();
+    private static ArrayList<GameData> games = new ArrayList<>();
 
     @Override
     public int createGame(String gameName) {
