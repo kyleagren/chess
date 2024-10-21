@@ -128,6 +128,7 @@ public class GameServiceTests {
             System.out.print(e.getMessage());
         }
         try {
+            gameService.deleteAll();
             gameList = gameService.getGames(authResult.authToken());
         } catch (Exception e) {
             System.out.print(e.getMessage());
