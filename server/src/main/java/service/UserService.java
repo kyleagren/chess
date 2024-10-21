@@ -44,9 +44,9 @@ public class UserService {
             throw new Exception("User does not exist");
         }
         if (password.equals(user.password())) {
-            if (authService.checkIfLoggedIn(username)) {
-                throw new Exception("already logged in");
-            }
+//            if (authService.checkIfLoggedIn(username)) {
+//                throw new Exception("already logged in");
+//            }
             try {
                 data = authService.createAuth(username);
             } catch (DataAccessException e) {
@@ -66,10 +66,10 @@ public class UserService {
                 authService.deleteAuth(token);
                 return new EmptySuccessResponse();
             }
-        } catch (DataAccessException e){
+            throw new Exception("unauthorized");
+        } catch (DataAccessException e) {
             throw new Exception(e.getMessage());
         }
-        throw new Exception("something went wrong");
     }
 
     public void deleteAll() {

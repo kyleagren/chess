@@ -12,15 +12,15 @@ public class GameDataAccessMemory implements GameDataAccess {
     public int createGame(String gameName) {
         int currentSize = games.size();
         ChessGame game = new ChessGame();
-        GameData gameRepresentation = new GameData(currentSize, "", "", gameName, game);
+        GameData gameRepresentation = new GameData(currentSize + 1, "", "", gameName, game);
         games.add(gameRepresentation);
-        return (currentSize);
+        return (currentSize + 1);
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         try {
-            return games.get(gameID);
+            return games.get(gameID - 1);
         } catch (IndexOutOfBoundsException e) {
             throw new DataAccessException("game does not exist");
         }
@@ -30,7 +30,7 @@ public class GameDataAccessMemory implements GameDataAccess {
     public void joinGame(int gameID, String playerColor, String username) throws DataAccessException {
         GameData game = null;
         try {
-            game = getGame(gameID);
+            game = getGame(gameID - 1);
         } catch (DataAccessException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -60,7 +60,7 @@ public class GameDataAccessMemory implements GameDataAccess {
     public boolean checkAvailability(int gameID, String playerColor) throws DataAccessException {
         GameData game = null;
         try {
-            game = getGame(gameID);
+            game = getGame(gameID - 1);
         } catch (DataAccessException e) {
             throw new DataAccessException(e.getMessage());
         }

@@ -50,9 +50,9 @@ public class Handler {
             Object result = userService.login(userData.username(), userData.password());
             return new Gson().toJson(result);
         } catch(Exception e) {
-            if (e.getMessage().equals("incorrect password")) {
+            if (e.getMessage().equals("incorrect password") || e.getMessage().equals("User does not exist")) {
                 res.status(401);
-                ErrorResponse error = new ErrorResponse("unauthorized");
+                ErrorResponse error = new ErrorResponse("Error: unauthorized");
                 return new Gson().toJson(error);
             }
             else {
@@ -70,9 +70,9 @@ public class Handler {
             Object result = userService.logout(token);
             return new Gson().toJson(result);
         } catch(Exception e) {
-        if (e.getMessage().equals("not found")) {
+        if (e.getMessage().equals("not found") ||e.getMessage().equals("unauthorized")) {
             res.status(401);
-            ErrorResponse error = new ErrorResponse("unauthorized");
+            ErrorResponse error = new ErrorResponse("Error: unauthorized");
             return new Gson().toJson(error);
         }
         else {
@@ -98,7 +98,7 @@ public class Handler {
         } catch (Exception e) {
             if (e.getMessage().equals("not found")) {
                 res.status(401);
-                ErrorResponse error = new ErrorResponse("unauthorized");
+                ErrorResponse error = new ErrorResponse("Error: unauthorized");
                 return new Gson().toJson(error);
             }
             else {
@@ -113,7 +113,7 @@ public class Handler {
         String token = req.headers("Authorization");
         res.type("application/json");
         var gameData = getBody(req, JoinGameRequestBody.class);
-        if (gameData.gameID() < 0 || !(gameData.playerColor().equals("WHITE") || gameData.playerColor().equals("BLACK"))) {
+        if (gameData.gameID() <= 0 || !(gameData.playerColor().equals("WHITE") || gameData.playerColor().equals("BLACK"))) {
             res.status(400);
             ErrorResponse error = new ErrorResponse("Error: bad request");
             return new Gson().toJson(error);
@@ -124,12 +124,12 @@ public class Handler {
         } catch (Exception e) {
             if (e.getMessage().equals("not found")) {
                 res.status(401);
-                ErrorResponse error = new ErrorResponse("unauthorized");
+                ErrorResponse error = new ErrorResponse("Error: unauthorized");
                 return new Gson().toJson(error);
             }
             else if (e.getMessage().equals("already taken")) {
                 res.status(403);
-                ErrorResponse error = new ErrorResponse("already taken");
+                ErrorResponse error = new ErrorResponse("Error: already taken");
                 return new Gson().toJson(error);
             }
             else {
@@ -149,7 +149,7 @@ public class Handler {
         } catch (Exception e) {
             if (e.getMessage().equals("not found")) {
                 res.status(401);
-                ErrorResponse error = new ErrorResponse("unauthorized");
+                ErrorResponse error = new ErrorResponse("Error: unauthorized");
                 return new Gson().toJson(error);
             }
             else {
