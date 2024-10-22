@@ -137,13 +137,21 @@ public class ChessGame {
                 if (currentPiece == null) {
                     continue;
                 }
-                if (currentPiece.getTeamColor() != teamColor) {
-                    ArrayList<ChessMove> oppositePieceMoves = new ArrayList<>(currentPiece.pieceMoves(board, new ChessPosition(row, column)));
-                    for (ChessMove oppositeMove : oppositePieceMoves) {
-                        if (oppositeMove.getEndPosition().equals(board.getKingPosition(teamColor))) {
-                            return true;
-                        }
-                    }
+                if (checkOppositeMoves(currentPiece, teamColor, row, column)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkOppositeMoves(ChessPiece currentPiece, TeamColor teamColor, int row, int column) {
+        if (currentPiece.getTeamColor() != teamColor) {
+            ArrayList<ChessMove> oppositePieceMoves = new ArrayList<>(currentPiece.pieceMoves(board,
+                    new ChessPosition(row, column)));
+            for (ChessMove oppositeMove : oppositePieceMoves) {
+                if (oppositeMove.getEndPosition().equals(board.getKingPosition(teamColor))) {
+                    return true;
                 }
             }
         }
