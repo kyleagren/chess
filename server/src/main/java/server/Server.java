@@ -1,8 +1,5 @@
 package server;
 
-import com.google.gson.Gson;
-import model.AuthData;
-import model.UserData;
 import spark.*;
 
 public class Server {
