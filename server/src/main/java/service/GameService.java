@@ -3,13 +3,14 @@ package service;
 import dataaccess.DataAccessException;
 import dataaccess.GameDataAccess;
 import dataaccess.GameDataAccessMemory;
+import dataaccess.GameDataAccessMySQL;
 import model.AuthData;
 import server.EmptySuccessResponse;
 import server.GameCreatedResponse;
 import server.GamesListResponse;
 
 public class GameService {
-    private final GameDataAccess gameDataAccess = new GameDataAccessMemory();
+    private final GameDataAccess gameDataAccess = new GameDataAccessMySQL();
     private final AuthService authService = new AuthService();
 
 

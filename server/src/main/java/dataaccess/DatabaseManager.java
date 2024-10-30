@@ -52,14 +52,14 @@ public class DatabaseManager {
             """
             CREATE TABLE IF NOT EXISTS game (
                 id int NOT NULL AUTO_INCREMENT,
-                whiteUsername varchar(256) NOT NULL,
-                blackUsername varchar(256) NOT NULL,
+                whiteUsername varchar(256),
+                blackUsername varchar(256),
                 gameName varchar(256) NOT NULL,
                 game varchar(2000) NOT NULL,
                 PRIMARY KEY (id)
             )"""
     };
-    
+
     /**
      * Creates the database if it does not already exist.
      */
