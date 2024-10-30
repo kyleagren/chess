@@ -8,5 +8,5 @@ public interface AuthDataAccess {
 
     void deleteAuth(String token) throws DataAccessException;
 
-    void deleteAll();
+    void deleteAll() throws DataAccessException;
 }

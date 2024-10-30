@@ -34,6 +34,10 @@ public class AuthService {
     }
 
     public void deleteAll() {
-        authDataAccess.deleteAll();
+        try {
+            authDataAccess.deleteAll();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

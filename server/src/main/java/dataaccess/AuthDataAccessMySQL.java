@@ -62,11 +62,34 @@ public class AuthDataAccessMySQL implements AuthDataAccess {
 
     @Override
     public void deleteAuth(String token) throws DataAccessException {
+        Connection conn;
 
+        try {
+            conn = DatabaseManager.getConnection();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        String sql = "DELETE FROM auth WHERE token=?";
+        try (var preparedStatement = conn.prepareStatement(sql)) {
+            preparedStatement.setString(1, token);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Not found");
+        }
     }
 
     @Override
-    public void deleteAll() {
-
+    public void deleteAll() throws DataAccessException {
+        Connection conn;
+        try {
+            conn = DatabaseManager.getConnection();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try (var preparedStatement = conn.prepareStatement("TRUNCATE auth")) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 }
