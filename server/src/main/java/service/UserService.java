@@ -51,8 +51,8 @@ public class UserService {
         if (user == null) {
             throw new Exception("User does not exist");
         }
-        String hashedPassword = hashPassword(password);
-        if (hashedPassword.equals(user.password())) {
+
+        if (BCrypt.checkpw(password, user.password())) {
             try {
                 data = authService.createAuth(username);
             } catch (DataAccessException e) {
