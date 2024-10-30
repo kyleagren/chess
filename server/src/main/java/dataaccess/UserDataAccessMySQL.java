@@ -16,7 +16,7 @@ public class UserDataAccessMySQL implements UserDataAccess {
         String password = "";
         String email = "";
 
-        Connection conn = null;
+        Connection conn;
 
         try {
             conn = DatabaseManager.getConnection();
@@ -49,7 +49,7 @@ public class UserDataAccessMySQL implements UserDataAccess {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        Connection conn = null;
+        Connection conn;
         String hashedPassword = hashPassword(userData.password());
         if (getUser(userData.username()) == null) {
             try {
@@ -75,6 +75,16 @@ public class UserDataAccessMySQL implements UserDataAccess {
 
     @Override
     public void deleteAll() {
-
+        Connection conn;
+        try {
+            conn = DatabaseManager.getConnection();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try (var preparedStatement = conn.prepareStatement("TRUNCATE user")) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

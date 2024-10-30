@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccessException;
 import dataaccess.UserDataAccess;
 import dataaccess.UserDataAccessMemory;
+import dataaccess.UserDataAccessMySQL;
 import model.AuthData;
 import model.UserData;
 import server.EmptySuccessResponse;
@@ -10,7 +11,7 @@ import server.EmptySuccessResponse;
 import java.util.UUID;
 
 public class UserService {
-    private final UserDataAccess userDataAccess = new UserDataAccessMemory();
+    private final UserDataAccess userDataAccess = new UserDataAccessMySQL();
     private final AuthService authService = new AuthService();
 
     public AuthData register(UserData userData) throws Exception {

@@ -32,6 +32,7 @@ public class DatabaseManager {
             throw new RuntimeException("unable to process db.properties. " + ex.getMessage());
         }
     }
+
     private static final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS user (
@@ -58,6 +59,7 @@ public class DatabaseManager {
                 PRIMARY KEY (id)
             )"""
     };
+    
     /**
      * Creates the database if it does not already exist.
      */
