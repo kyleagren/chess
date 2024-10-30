@@ -13,7 +13,7 @@ public interface GameDataAccess {
 
     boolean checkAvailability(int gameID, String playerColor) throws DataAccessException;
 
-    ArrayList<GameData> getGames();
+    ArrayList<GameData> getGames() throws DataAccessException;
 
     void deleteAll();
 }
