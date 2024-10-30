@@ -67,6 +67,10 @@ public class GameService {
     }
 
     public void deleteAll() {
-        gameDataAccess.deleteAll();
+        try {
+            gameDataAccess.deleteAll();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
