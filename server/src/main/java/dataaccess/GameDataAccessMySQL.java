@@ -44,7 +44,36 @@ public class GameDataAccessMySQL implements GameDataAccess {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        return null;
+        Connection conn;
+
+        int id = 0;
+        String gameName = "";
+        String gameString = "";
+        String whiteUsername = null;
+        String blackUsername = null;
+
+        try {
+            conn = DatabaseManager.getConnection();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        String sql = "SELECT (id, gameName, game, whiteUsername, blackUsername) FROM game WHERE id=?";
+        try (var preparedStatement = conn.prepareStatement(sql)) {
+            preparedStatement.setInt(1, gameID);
+            try (var rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    id = rs.getInt("id");
+                    gameName = rs.getString("gameName");
+                    gameString = rs.getString("game");
+                    whiteUsername = rs.getString("whiteUsername");
+                    blackUsername = rs.getString("blackUsername");
+                }
+                ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
+                return new GameData(id, whiteUsername, blackUsername, gameName, game);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("game does not exist");
+        }
     }
 
     @Override
