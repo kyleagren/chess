@@ -9,14 +9,14 @@ import java.sql.Statement;
 
 public class UserDataAccessMySQL implements UserDataAccess {
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws DataAccessException {
+        Connection conn;
+
         boolean found = false;
 
         String usernameResult = "";
         String password = "";
         String email = "";
-
-        Connection conn;
 
         try {
             conn = DatabaseManager.getConnection();
@@ -38,19 +38,15 @@ public class UserDataAccessMySQL implements UserDataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
         return null;
-    }
-
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         Connection conn;
-        String hashedPassword = hashPassword(userData.password());
+
         if (getUser(userData.username()) == null) {
             try {
                 conn = DatabaseManager.getConnection();
@@ -60,12 +56,12 @@ public class UserDataAccessMySQL implements UserDataAccess {
             String sql = "INSERT INTO user (username, password, email) VALUES(?, ?, ?)";
             try (var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 preparedStatement.setString(1, userData.username());
-                preparedStatement.setString(2, hashedPassword);
+                preparedStatement.setString(2, userData.password());
                 preparedStatement.setString(3, userData.email());
 
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new DataAccessException(e.getMessage());
             }
         }
         else {
@@ -74,7 +70,7 @@ public class UserDataAccessMySQL implements UserDataAccess {
     }
 
     @Override
-    public void deleteAll() {
+    public void deleteAll() throws DataAccessException {
         Connection conn;
         try {
             conn = DatabaseManager.getConnection();
@@ -84,7 +80,7 @@ public class UserDataAccessMySQL implements UserDataAccess {
         try (var preparedStatement = conn.prepareStatement("TRUNCATE user")) {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 }

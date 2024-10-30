@@ -6,6 +6,7 @@ import dataaccess.UserDataAccessMemory;
 import dataaccess.UserDataAccessMySQL;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import server.EmptySuccessResponse;
 
 import java.util.UUID;
@@ -14,6 +15,10 @@ public class UserService {
     private final UserDataAccess userDataAccess = new UserDataAccessMySQL();
     private final AuthService authService = new AuthService();
 
+    private String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
     public AuthData register(UserData userData) throws Exception {
         var username = userData.username();
         UserData user = userDataAccess.getUser(username);
@@ -21,7 +26,9 @@ public class UserService {
 
         if (user == null) {
             try {
-                userDataAccess.createUser(userData);
+                String hashedPassword = hashPassword(userData.password());
+                UserData secureUser = new UserData(userData.username(), hashedPassword, userData.email());
+                userDataAccess.createUser(secureUser);
             } catch (DataAccessException e) {
                 throw new Exception(e.getMessage());
             }
@@ -44,7 +51,8 @@ public class UserService {
         if (user == null) {
             throw new Exception("User does not exist");
         }
-        if (password.equals(user.password())) {
+        String hashedPassword = hashPassword(password);
+        if (hashedPassword.equals(user.password())) {
             try {
                 data = authService.createAuth(username);
             } catch (DataAccessException e) {
@@ -71,6 +79,10 @@ public class UserService {
     }
 
     public void deleteAll() {
-        userDataAccess.deleteAll();
+        try {
+            userDataAccess.deleteAll();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

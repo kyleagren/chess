@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDataAccessMemory;
+import dataaccess.AuthDataAccessMySQL;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import dataaccess.AuthDataAccess;
@@ -8,7 +9,7 @@ import dataaccess.AuthDataAccess;
 import java.util.UUID;
 
 public class AuthService {
-    private final AuthDataAccess authDataAccess = new AuthDataAccessMemory();
+    private final AuthDataAccess authDataAccess = new AuthDataAccessMySQL();
 
     public AuthData createAuth(String username) throws Exception {
         if (username == null) {
