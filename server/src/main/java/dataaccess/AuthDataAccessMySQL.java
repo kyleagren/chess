@@ -4,6 +4,7 @@ import model.AuthData;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class AuthDataAccessMySQL implements AuthDataAccess {
     @Override
@@ -40,8 +41,23 @@ public class AuthDataAccessMySQL implements AuthDataAccess {
     }
 
     @Override
-    public void createAuth(AuthData data) {
+    public void createAuth(AuthData data) throws DataAccessException {
+        Connection conn;
 
+        try {
+            conn = DatabaseManager.getConnection();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        String sql = "INSERT INTO auth (token, username) VALUES(?, ?)";
+        try (var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, data.authToken());
+            preparedStatement.setString(2, data.username());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
