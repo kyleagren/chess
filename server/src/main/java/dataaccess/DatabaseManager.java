@@ -81,6 +81,18 @@ public class DatabaseManager {
         }
     }
 
+    public static void deleteDatabase() throws DataAccessException {
+        try {
+            var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+            conn.setCatalog("chess");
+            try (var preparedStatement = conn.prepareStatement("DROP TABLE IF EXISTS user, auth, game")) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
     /**
      * Create a connection to the database and sets the catalog based upon the
      * properties specified in db.properties. Connections to the database should

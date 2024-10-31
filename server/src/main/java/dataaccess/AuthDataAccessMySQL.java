@@ -5,6 +5,7 @@ import model.AuthData;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 public class AuthDataAccessMySQL implements AuthDataAccess {
     @Override
@@ -56,13 +57,16 @@ public class AuthDataAccessMySQL implements AuthDataAccess {
 
     @Override
     public void deleteAuth(String token) throws DataAccessException {
+        try {
+            UUID.fromString(token);
+        } catch (Exception e) {
+            throw new DataAccessException("doesn't exist");
+        }
         try (Connection conn = DatabaseManager.getConnection()){
             String sql = "DELETE FROM auth WHERE token=?";
             try (var preparedStatement = conn.prepareStatement(sql)) {
                 preparedStatement.setString(1, token);
                 preparedStatement.executeUpdate();
-            } catch (SQLException e) {
-                throw new DataAccessException("Not found");
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());

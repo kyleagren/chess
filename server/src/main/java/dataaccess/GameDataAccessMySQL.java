@@ -57,9 +57,10 @@ public class GameDataAccessMySQL implements GameDataAccess {
                         gameString = rs.getString("game");
                         whiteUsername = rs.getString("whiteUsername");
                         blackUsername = rs.getString("blackUsername");
+
+                        ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
+                        return new GameData(id, whiteUsername, blackUsername, gameName, game);
                     }
-                    ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
-                    return new GameData(id, whiteUsername, blackUsername, gameName, game);
                 }
             } catch (SQLException e) {
                 throw new DataAccessException("game does not exist");
@@ -67,13 +68,16 @@ public class GameDataAccessMySQL implements GameDataAccess {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
+        throw new DataAccessException("invalid index");
     }
 
     @Override
     public void joinGame(int gameID, String playerColor, String username) throws DataAccessException {
         String whiteUsername = null;
         String blackUsername = null;
-
+        if (gameID == 0) {
+            throw new DataAccessException("invalid game ID");
+        }
         try (Connection conn = DatabaseManager.getConnection()) {
             String sql = "SELECT whiteUsername, blackUsername FROM game WHERE id=?";
             try (var preparedStatement = conn.prepareStatement(sql)) {
@@ -93,6 +97,9 @@ public class GameDataAccessMySQL implements GameDataAccess {
                             newStatement.executeUpdate();
                         }
                     }
+                    else {
+                        throw new DataAccessException("username already taken");
+                    }
                 }
                 if (playerColor.equals("BLACK")) {
                     if (blackUsername == null) {
@@ -102,6 +109,9 @@ public class GameDataAccessMySQL implements GameDataAccess {
 
                             newStatement.executeUpdate();
                         }
+                    }
+                    else {
+                        throw new DataAccessException("username already taken");
                     }
                 }
             } catch (SQLException e) {

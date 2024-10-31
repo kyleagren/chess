@@ -36,7 +36,6 @@ public class AuthServiceTests {
         Assertions.assertNotNull(actualAuth);
         Assertions.assertEquals(expectedAuth.username(), actualAuth.username());
         Assertions.assertTrue(Pattern.matches("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})", actualAuth.authToken()));
-
     }
 
     @Test

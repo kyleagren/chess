@@ -85,9 +85,9 @@ public class GameServiceTests {
         } else {
             gameID = 2;
         }
-        // gameID + 1 should not exist so we should get an error.
+        // gameID 0 should not exist so it should fail.
         Assertions.assertThrows(Exception.class, () -> gameService.joinGame(authResult.authToken(),
-                gameID + 1, "WHITE"));
+                0, "WHITE"));
     }
 
     @Test
