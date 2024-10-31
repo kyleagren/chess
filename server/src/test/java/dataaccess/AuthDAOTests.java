@@ -11,7 +11,7 @@ import java.util.UUID;
 public class AuthDAOTests {
     Connection conn;
     AuthDataAccess authDAO = new AuthDataAccessMySQL();
-    String goodToken = "";
+    String goodToken = UUID.randomUUID().toString();
     String username = "testUser1";
 
     @BeforeAll
@@ -56,7 +56,6 @@ public class AuthDAOTests {
     @Test
     @Order(1)
     public void createAuthSuccess() {
-        goodToken = UUID.randomUUID().toString();
         AuthData data = new AuthData(goodToken, username);
         Assertions.assertDoesNotThrow(() -> authDAO.createAuth(data));
     }
@@ -64,7 +63,8 @@ public class AuthDAOTests {
     @Test
     @Order(2)
     public void createAuthFailure() {
-        // TODO - how do I fail here as well?
+        AuthData data = new AuthData(null, null);
+        Assertions.assertThrows(Exception.class, () -> authDAO.createAuth(data));
     }
 
     @Test
@@ -75,8 +75,8 @@ public class AuthDAOTests {
 
     @Test
     @Order(4)
-    public void getAuthFailure() {
-        Assertions.assertThrows(Exception.class, () -> authDAO.getAuth(UUID.randomUUID().toString()));
+    public void getAuthFailure() throws DataAccessException {
+        Assertions.assertNull(authDAO.getAuth(UUID.randomUUID().toString()));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class AuthDAOTests {
     @Test
     @Order(6)
     public void deleteAuthFailure() {
-        Assertions.assertThrows(Exception.class, () -> authDAO.deleteAuth(goodToken));
+        Assertions.assertThrows(Exception.class, () -> authDAO.deleteAuth(""));
     }
 
     @Test

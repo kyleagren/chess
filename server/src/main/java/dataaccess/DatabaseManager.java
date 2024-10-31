@@ -85,7 +85,13 @@ public class DatabaseManager {
         try {
             var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
             conn.setCatalog("chess");
-            try (var preparedStatement = conn.prepareStatement("DROP TABLE IF EXISTS user, auth, game")) {
+            try (var preparedStatement = conn.prepareStatement("TRUNCATE user")) {
+                preparedStatement.executeUpdate();
+            }
+            try (var preparedStatement = conn.prepareStatement("TRUNCATE auth")) {
+                preparedStatement.executeUpdate();
+            }
+            try (var preparedStatement = conn.prepareStatement("TRUNCATE game")) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {

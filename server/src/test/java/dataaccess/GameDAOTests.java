@@ -15,8 +15,8 @@ public class GameDAOTests {
     @BeforeAll
     public static void init() {
         try {
-            DatabaseManager.deleteDatabase();
             Connection conn = DatabaseManager.getConnection();
+            DatabaseManager.deleteDatabase();
             DatabaseManager.createDatabase();
             conn.close();
         } catch (DataAccessException | SQLException e) {
@@ -61,19 +61,18 @@ public class GameDAOTests {
     @Test
     @Order(2)
     public void createGameFailure() {
-        // TODO - think of a better way to do this.
-        Assertions.assertThrows(Exception.class, () -> gameDAO.createGame("'; DROP TABLE game"));
+        Assertions.assertThrows(Exception.class, () -> gameDAO.createGame(null));
     }
 
     @Test
     @Order(3)
-    public void getGameSuccess() throws DataAccessException {
+    public void getGameSuccess() {
         Assertions.assertDoesNotThrow(() -> gameDAO.getGame(1));
     }
 
     @Test
     @Order(4)
-    public void getGameFailure() throws DataAccessException {
+    public void getGameFailure() {
         Assertions.assertThrows(Exception.class, () -> gameDAO.getGame(3));
     }
 
@@ -108,7 +107,7 @@ public class GameDAOTests {
         gameDAO.createGame("test2");
 
         ArrayList<GameData> items = gameDAO.getGames();
-        Assertions.assertEquals(items.size(), 4); // TODO - change to 3 once I fix createGameFailure
+        Assertions.assertEquals(3, items.size());
     }
 
     @Test
