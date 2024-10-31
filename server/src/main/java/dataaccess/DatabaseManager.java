@@ -70,7 +70,7 @@ public class DatabaseManager {
             try (var preparedStatement = conn.prepareStatement(newStatement)) {
                 preparedStatement.executeUpdate();
             }
-            conn.setCatalog("chess");
+            conn.setCatalog(DATABASE_NAME);
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
@@ -84,7 +84,7 @@ public class DatabaseManager {
     public static void deleteDatabase() throws DataAccessException {
         try {
             var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
-            conn.setCatalog("chess");
+            conn.setCatalog(DATABASE_NAME);
             try (var preparedStatement = conn.prepareStatement("TRUNCATE user")) {
                 preparedStatement.executeUpdate();
             }
