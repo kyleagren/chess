@@ -15,42 +15,26 @@ public class UserDAOTests {
     String email = "";
 
     @BeforeAll
-    public static void init() {
-        try {
-            DatabaseManager.deleteDatabase();
-            Connection conn = DatabaseManager.getConnection();
-            DatabaseManager.createDatabase();
-            conn.close();
-        } catch (DataAccessException | SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public static void init() throws DataAccessException, SQLException {
+        DatabaseManager.deleteDatabase();
+        Connection conn = DatabaseManager.getConnection();
+        DatabaseManager.createDatabase();
+        conn.close();
     }
 
     @BeforeEach
-    public void setup() {
-        try {
-            conn = DatabaseManager.getConnection();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public void setup() throws DataAccessException {
+        conn = DatabaseManager.getConnection();
     }
 
     @AfterEach
-    public void tearDown() {
-        try {
-            conn.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public void tearDown() throws SQLException {
+        conn.close();
     }
 
     @AfterAll
-    public static void cleanUp() {
-        try {
-            DatabaseManager.deleteDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public static void cleanUp() throws DataAccessException {
+        DatabaseManager.deleteDatabase();
     }
 
     @Test

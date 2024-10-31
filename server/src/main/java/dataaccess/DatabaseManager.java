@@ -33,7 +33,7 @@ public class DatabaseManager {
         }
     }
 
-    private static final String[] createStatements = {
+    private static final String[] CREATE_STATEMENTS = {
             """
             CREATE TABLE IF NOT EXISTS user (
                 id int NOT NULL AUTO_INCREMENT,
@@ -71,7 +71,7 @@ public class DatabaseManager {
                 preparedStatement.executeUpdate();
             }
             conn.setCatalog(DATABASE_NAME);
-            for (var statement : createStatements) {
+            for (var statement : CREATE_STATEMENTS) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }

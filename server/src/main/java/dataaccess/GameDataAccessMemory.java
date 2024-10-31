@@ -57,23 +57,6 @@ public class GameDataAccessMemory implements GameDataAccess {
     }
 
     @Override
-    public boolean checkAvailability(int gameID, String playerColor) throws DataAccessException {
-        GameData game;
-        try {
-            game = getGame(gameID);
-        } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-        if (playerColor.equals("WHITE")) {
-            return game.whiteUsername() == null;
-        }
-        else if (playerColor.equals("BLACK")) {
-            return game.blackUsername() == null;
-        }
-        throw new DataAccessException("invalid color provided");
-    }
-
-    @Override
     public ArrayList<GameData> getGames() {
         return games;
     }

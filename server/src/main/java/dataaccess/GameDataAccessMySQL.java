@@ -88,31 +88,24 @@ public class GameDataAccessMySQL implements GameDataAccess {
                         blackUsername = rs.getString("blackUsername");
                     }
                 }
-                if (playerColor.equals("WHITE")) {
-                    if (whiteUsername == null) {
-                        try (var newStatement = conn.prepareStatement("UPDATE game SET whiteUsername=? WHERE id=?")) {
-                            newStatement.setString(1, username);
-                            newStatement.setInt(2, gameID);
+                if (playerColor.equals("WHITE") && whiteUsername == null) {
+                    try (var newStatement = conn.prepareStatement("UPDATE game SET whiteUsername=? WHERE id=?")) {
+                        newStatement.setString(1, username);
+                        newStatement.setInt(2, gameID);
 
-                            newStatement.executeUpdate();
-                        }
-                    }
-                    else {
-                        throw new DataAccessException("username already taken");
+                        newStatement.executeUpdate();
                     }
                 }
-                if (playerColor.equals("BLACK")) {
-                    if (blackUsername == null) {
-                        try (var newStatement = conn.prepareStatement("UPDATE game SET blackUsername=? WHERE id=?")) {
-                            newStatement.setString(1, username);
-                            newStatement.setInt(2, gameID);
+                else if (playerColor.equals("BLACK") && blackUsername == null) {
+                    try (var newStatement = conn.prepareStatement("UPDATE game SET blackUsername=? WHERE id=?")) {
+                        newStatement.setString(1, username);
+                        newStatement.setInt(2, gameID);
 
-                            newStatement.executeUpdate();
-                        }
+                        newStatement.executeUpdate();
                     }
-                    else {
-                        throw new DataAccessException("username already taken");
-                    }
+                }
+                else {
+                    throw new DataAccessException("username already taken");
                 }
             } catch (SQLException e) {
                 throw new DataAccessException(e.getMessage());
@@ -120,23 +113,6 @@ public class GameDataAccessMySQL implements GameDataAccess {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-    }
-
-    @Override
-    public boolean checkAvailability(int gameID, String playerColor) throws DataAccessException {
-        GameData game;
-        try {
-            game = getGame(gameID);
-        } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-        if (playerColor.equals("WHITE")) {
-            return game.whiteUsername() == null;
-        }
-        else if (playerColor.equals("BLACK")) {
-            return game.blackUsername() == null;
-        }
-        throw new DataAccessException("invalid color provided");
     }
 
     @Override
