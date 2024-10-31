@@ -28,8 +28,7 @@ public class GameDAOTests {
     public void setup() {
         try {
             conn = DatabaseManager.getConnection();
-            conn.setCatalog("chess");
-        } catch (DataAccessException | SQLException e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
