@@ -2,54 +2,11 @@ package dataaccess;
 
 import model.GameData;
 import org.junit.jupiter.api.*;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class GameDAOTests {
-    Connection conn;
+public class GameDAOTests extends DAOTest {
     GameDataAccess gameDAO = new GameDataAccessMySQL();
-
-    @BeforeAll
-    public static void init() {
-        try {
-            Connection conn = DatabaseManager.getConnection();
-            DatabaseManager.deleteDatabase();
-            DatabaseManager.createDatabase();
-            conn.close();
-        } catch (DataAccessException | SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @BeforeEach
-    public void setup() {
-        try {
-            conn = DatabaseManager.getConnection();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @AfterEach
-    public void tearDown() {
-        try {
-            conn.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @AfterAll
-    public static void cleanUp() {
-        try {
-            DatabaseManager.deleteDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Test
     @Order(1)

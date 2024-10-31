@@ -3,39 +3,12 @@ package dataaccess;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-public class UserDAOTests {
-    Connection conn;
+public class UserDAOTests extends DAOTest {
     UserDataAccess userDAO = new UserDataAccessMySQL();
 
     String username = "";
     String password = "";
     String email = "";
-
-    @BeforeAll
-    public static void init() throws DataAccessException, SQLException {
-        DatabaseManager.deleteDatabase();
-        Connection conn = DatabaseManager.getConnection();
-        DatabaseManager.createDatabase();
-        conn.close();
-    }
-
-    @BeforeEach
-    public void setup() throws DataAccessException {
-        conn = DatabaseManager.getConnection();
-    }
-
-    @AfterEach
-    public void tearDown() throws SQLException {
-        conn.close();
-    }
-
-    @AfterAll
-    public static void cleanUp() throws DataAccessException {
-        DatabaseManager.deleteDatabase();
-    }
 
     @Test
     @Order(1)
