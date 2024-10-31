@@ -1,9 +1,7 @@
 package dataaccess;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import model.UserData;
+import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -11,6 +9,10 @@ import java.sql.SQLException;
 public class UserDAOTests {
     Connection conn;
     UserDataAccess userDAO = new UserDataAccessMySQL();
+
+    String username = "";
+    String password = "";
+    String email = "";
 
     @BeforeAll
     public static void init() {
@@ -42,28 +44,44 @@ public class UserDAOTests {
         }
     }
 
-    @Test
-    public void getUserSuccess() {
-
+    @AfterAll
+    public static void cleanUp() {
+        try {
+            DatabaseManager.deleteDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
-    public void getUserFailure() {
-
-    }
-
-    @Test
+    @Order(1)
     public void createUserSuccess() {
-
+        UserData data = new UserData(username, password, email);
+        Assertions.assertDoesNotThrow(() -> userDAO.createUser(data));
     }
 
     @Test
+    @Order(2)
     public void createUserFailure() {
-
+        UserData data = new UserData(username, password, email);
+        Assertions.assertThrows(Exception.class, () -> userDAO.createUser(data));
     }
 
     @Test
-    public void deleteAllSuccess() {
+    @Order(3)
+    public void getUserSuccess() {
+        Assertions.assertDoesNotThrow(() -> userDAO.getUser(username));
+    }
 
+    @Test
+    @Order(4)
+    public void getUserFailure() throws DataAccessException {
+        Assertions.assertNull(userDAO.getUser("meaninglessness"));
+    }
+
+    @Test
+    @Order(5)
+    public void deleteAllSuccess() {
+        Assertions.assertDoesNotThrow(() -> userDAO.deleteAll());
     }
 }
