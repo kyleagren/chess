@@ -112,8 +112,11 @@ public class GameDAOTests {
 
     @Test
     @Order(10)
-    public void getGamesFailure() {
-        // TODO - get help here I don't know what to try.
+    public void getGamesEmpty() throws DataAccessException {
+        gameDAO.deleteAll();
+
+        ArrayList<GameData> items = gameDAO.getGames();
+        Assertions.assertEquals(0, items.size());
     }
 
     @Test

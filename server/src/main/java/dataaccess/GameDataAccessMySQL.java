@@ -40,18 +40,18 @@ public class GameDataAccessMySQL implements GameDataAccess {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        int id = 0;
-        String gameName = "";
-        String gameString = "";
-        String whiteUsername = null;
-        String blackUsername = null;
+        int id;
+        String gameName;
+        String gameString;
+        String whiteUsername;
+        String blackUsername;
 
         try (Connection conn = DatabaseManager.getConnection()){
             String sql = "SELECT id, gameName, game, whiteUsername, blackUsername FROM game WHERE id=?";
             try (var preparedStatement = conn.prepareStatement(sql)) {
                 preparedStatement.setInt(1, gameID);
                 try (var rs = preparedStatement.executeQuery()) {
-                    while (rs.next()) {
+                    if (rs.next()) {
                         id = rs.getInt("id");
                         gameName = rs.getString("gameName");
                         gameString = rs.getString("game");
@@ -143,11 +143,11 @@ public class GameDataAccessMySQL implements GameDataAccess {
     public ArrayList<GameData> getGames() throws DataAccessException {
         ArrayList<GameData> games = new ArrayList<>();
 
-        int id = 0;
-        String gameName = "";
-        String gameString = "";
-        String whiteUsername = null;
-        String blackUsername = null;
+        int id;
+        String gameName;
+        String gameString;
+        String whiteUsername;
+        String blackUsername;
 
         try (Connection conn = DatabaseManager.getConnection()) {
             String sql = "SELECT id, gameName, game, whiteUsername, blackUsername FROM game";
