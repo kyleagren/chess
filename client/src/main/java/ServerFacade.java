@@ -53,6 +53,11 @@ public class ServerFacade {
         return this.makeRequest("GET", path, null, GamesListResponse.class, token);
     }
 
+    public EmptySuccessResponse clear() throws ResponseException {
+        var path = "/db";
+        return this.makeRequest("DELETE", path, null, EmptySuccessResponse.class, "");
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String token) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
