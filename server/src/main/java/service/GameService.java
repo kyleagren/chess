@@ -52,7 +52,7 @@ public class GameService {
         }
     }
 
-    public Object getGames(String token) throws Exception {
+    public GamesListResponse getGames(String token) throws Exception {
         try {
             if (authService.getAuth(token) != null) {
                 return new GamesListResponse(gameDataAccess.getGames());

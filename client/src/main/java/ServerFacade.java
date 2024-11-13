@@ -5,6 +5,7 @@ import model.GameData;
 import model.UserData;
 import response.EmptySuccessResponse;
 import response.GameCreatedResponse;
+import response.GamesListResponse;
 import response.JoinGameRequestBody;
 
 import java.io.IOException;
@@ -34,19 +35,7 @@ public class ServerFacade {
 
     public EmptySuccessResponse logout(String token) throws ResponseException {
         var path = "/session";
-        try {
-            URL url = (new URI(serverUrl + path)).toURL();
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-            http.setRequestMethod("DELETE");
-            http.setDoOutput(true);
-
-            addAuthorization(http, token);
-            http.connect();
-            throwIfNotSuccessful(http);
-            return readBody(http, EmptySuccessResponse.class);
-        } catch (Exception e) {
-            throw new ResponseException(500, e.getMessage());
-        }
+        return this.makeRequest("DELETE", path, null, EmptySuccessResponse.class, token);
     }
 
     public GameCreatedResponse createGame(GameData data, String token) throws ResponseException {
@@ -57,6 +46,11 @@ public class ServerFacade {
     public EmptySuccessResponse joinGame(JoinGameRequestBody info, String token) throws ResponseException {
         var path = "game";
         return this.makeRequest("PUT", path, info, EmptySuccessResponse.class, token);
+    }
+
+    public GamesListResponse listGames(String token) throws ResponseException {
+        var path = "game";
+        return this.makeRequest("GET", path, null, GamesListResponse.class, token);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String token) throws ResponseException {
