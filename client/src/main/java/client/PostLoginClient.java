@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public class PostLoginClient extends ChessClient {
     ServerFacade server;
+    String token = null;
 
     public PostLoginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -44,6 +45,7 @@ public class PostLoginClient extends ChessClient {
     }
 
     public String logout(String... params) throws ResponseException {
+        server.logout(getToken());
         return "";
     }
 

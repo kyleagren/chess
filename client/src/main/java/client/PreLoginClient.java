@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 public class PreLoginClient extends ChessClient {
     private final ServerFacade server;
-    private String token;
 
     public PreLoginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -51,7 +50,7 @@ public class PreLoginClient extends ChessClient {
 
             try {
                 AuthData auth = server.login(data);
-                token = auth.authToken();
+                setToken(auth.authToken());
             } catch (ResponseException e) {
                 return e.getMessage();
             }
@@ -72,7 +71,7 @@ public class PreLoginClient extends ChessClient {
             UserData data = new UserData(username, password, email);
             try {
                 AuthData auth = server.login(data);
-                token = auth.authToken();
+                setToken(auth.authToken());
             } catch (ResponseException e) {
                 return e.getMessage();
             }
