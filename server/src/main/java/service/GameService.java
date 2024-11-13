@@ -13,7 +13,7 @@ public class GameService {
     private final AuthService authService = new AuthService();
 
 
-    public Object createGame(String token, String gameName) throws Exception {
+    public GameCreatedResponse createGame(String token, String gameName) throws Exception {
         try {
             if (authService.getAuth(token) != null) {
                 int gameID = gameDataAccess.createGame(gameName);
@@ -27,7 +27,7 @@ public class GameService {
         }
     }
 
-    public Object joinGame(String token, int gameID, String playerColor) throws Exception {
+    public EmptySuccessResponse joinGame(String token, int gameID, String playerColor) throws Exception {
         try {
             AuthData auth = authService.getAuth(token);
             if (auth != null) {

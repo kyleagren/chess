@@ -5,6 +5,7 @@ import model.GameData;
 import model.UserData;
 import response.EmptySuccessResponse;
 import response.GameCreatedResponse;
+import response.JoinGameRequestBody;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +54,10 @@ public class ServerFacade {
         return this.makeRequest("POST", path, data, GameCreatedResponse.class, token);
     }
 
-
+    public EmptySuccessResponse joinGame(JoinGameRequestBody info, String token) throws ResponseException {
+        var path = "game";
+        return this.makeRequest("PUT", path, info, EmptySuccessResponse.class, token);
+    }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String token) throws ResponseException {
         try {

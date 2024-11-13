@@ -6,6 +6,7 @@ import model.GameData;
 import model.UserData;
 import response.EmptySuccessResponse;
 import response.ErrorResponse;
+import response.GameCreatedResponse;
 import response.JoinGameRequestBody;
 import service.AuthService;
 import service.GameService;
@@ -97,7 +98,7 @@ public class Handler {
             return new Gson().toJson(error);
         }
         try {
-            Object result = gameService.createGame(token, gameData.gameName());
+            GameCreatedResponse result = gameService.createGame(token, gameData.gameName());
             return new Gson().toJson(result);
         } catch (Exception e) {
             return exceptionHandler(e, res);
