@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import model.AuthData;
 import model.GameData;
 import model.UserData;
 import service.AuthService;
@@ -22,7 +23,7 @@ public class Handler {
             return new Gson().toJson(error);
         }
         try {
-            Object result = userService.register(userData);
+            AuthData result = userService.register(userData);
             return new Gson().toJson(result);
         } catch(Exception e) {
             if (e.getMessage().equals("already taken")) {
