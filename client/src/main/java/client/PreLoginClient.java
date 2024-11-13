@@ -21,9 +21,9 @@ public class PreLoginClient extends ChessClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "login" -> logIn(params);
+                case "login" -> login(params);
                 case "register" -> register(params);
-                case "quit" -> quit();
+                case "quit" -> "quit";
                 default -> help();
             };
         } catch (ResponseException e) {
@@ -31,7 +31,16 @@ public class PreLoginClient extends ChessClient {
         }
     }
 
-    public String logIn(String... params) throws ResponseException {
+    @Override
+    public String help() {
+        return """
+                - register <username> <password> <email>
+                - login <username> <password>
+                - quit
+                """;
+    }
+
+    public String login(String... params) throws ResponseException {
         String username = "";
         String password;
         if (params.length >= 2) {

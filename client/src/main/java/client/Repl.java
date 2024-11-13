@@ -5,23 +5,28 @@ import ui.EscapeSequences;
 import java.util.Scanner;
 
 public class Repl {
-    private final ChessClient client;
+    private ChessClient client;
+    private String serverUrl;
 
     public Repl(String serverUrl) {
-        client = new PreLoginClient(serverUrl);
+        this.serverUrl = serverUrl;
     }
 
     public void run() {
+        client = new PreLoginClient(serverUrl);
         System.out.println("Welcome to Chess. Sign in to start.");
 
         Scanner scanner = new Scanner(System.in);
-        var result = "";
+        String result = "";
         while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
 
             try {
                 result = client.eval(line);
+                if (result.contains("logged") || result.contains("registered")) {
+                    client = new PostLoginClient(serverUrl);
+                }
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {
                 String message = e.toString();
