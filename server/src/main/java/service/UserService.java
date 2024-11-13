@@ -2,12 +2,11 @@ package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.UserDataAccess;
-import dataaccess.UserDataAccessMemory;
 import dataaccess.UserDataAccessMySQL;
 import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
-import server.EmptySuccessResponse;
+import response.EmptySuccessResponse;
 
 import java.util.UUID;
 
@@ -65,7 +64,7 @@ public class UserService {
         return data;
     }
 
-    public Object logout(String token) throws Exception {
+    public EmptySuccessResponse logout(String token) throws Exception {
         try{
             UUID.fromString(token);
             if (authService.getAuth(token) != null) {

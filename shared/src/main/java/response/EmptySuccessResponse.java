@@ -1,4 +1,4 @@
-package server;
+package response;
 
 public class EmptySuccessResponse {
 }

@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import response.EmptySuccessResponse;
+import response.ErrorResponse;
+import response.JoinGameRequestBody;
 import service.AuthService;
 import service.GameService;
 import spark.*;
@@ -68,7 +71,7 @@ public class Handler {
         String token = req.headers("Authorization");
         res.type("application/json");
         try {
-            Object result = userService.logout(token);
+            EmptySuccessResponse result = userService.logout(token);
             return new Gson().toJson(result);
         } catch(Exception e) {
         if (e.getMessage().equals("not found") ||e.getMessage().equals("unauthorized")) {

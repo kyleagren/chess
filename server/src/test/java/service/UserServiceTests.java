@@ -3,7 +3,7 @@ package service;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import server.EmptySuccessResponse;
+import response.EmptySuccessResponse;
 
 import java.util.UUID;
 import java.util.regex.Pattern;

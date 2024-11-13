@@ -2,10 +2,10 @@ package service;
 
 import model.AuthData;
 import org.junit.jupiter.api.*;
-import server.EmptySuccessResponse;
-import server.GameCreatedResponse;
-import server.GamesListResponse;
-import server.TruncatedGameData;
+import response.EmptySuccessResponse;
+import response.GameCreatedResponse;
+import response.GamesListResponse;
+import response.TruncatedGameData;
 
 import java.util.ArrayList;
 

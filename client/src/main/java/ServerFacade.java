@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
+import response.EmptySuccessResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +24,27 @@ public class ServerFacade {
         return this.makeRequest("POST", path, data, AuthData.class);
     }
 
-    public
+    public AuthData login(UserData data) throws ResponseException {
+        var path = "/session";
+        return this.makeRequest("POST", path, data, AuthData.class);
+    }
+
+    public EmptySuccessResponse logout(String token) throws ResponseException {
+        var path = "/session";
+        try {
+            URL url = (new URI(serverUrl + path)).toURL();
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestMethod("DELETE");
+            http.setDoOutput(true);
+
+            http.addRequestProperty("Authorization", token);
+            http.connect();
+            throwIfNotSuccessful(http);
+            return readBody(http, EmptySuccessResponse.class);
+        } catch (Exception e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
