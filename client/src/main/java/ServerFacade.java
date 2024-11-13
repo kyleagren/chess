@@ -1,8 +1,10 @@
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import response.EmptySuccessResponse;
+import response.GameCreatedResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,12 +23,12 @@ public class ServerFacade {
 
     public AuthData register(UserData data) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, data, AuthData.class);
+        return this.makeRequest("POST", path, data, AuthData.class, "");
     }
 
     public AuthData login(UserData data) throws ResponseException {
         var path = "/session";
-        return this.makeRequest("POST", path, data, AuthData.class);
+        return this.makeRequest("POST", path, data, AuthData.class, "");
     }
 
     public EmptySuccessResponse logout(String token) throws ResponseException {
@@ -37,7 +39,7 @@ public class ServerFacade {
             http.setRequestMethod("DELETE");
             http.setDoOutput(true);
 
-            http.addRequestProperty("Authorization", token);
+            addAuthorization(http, token);
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, EmptySuccessResponse.class);
@@ -46,7 +48,14 @@ public class ServerFacade {
         }
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    public GameCreatedResponse createGame(GameData data, String token) throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("POST", path, data, GameCreatedResponse.class, token);
+    }
+
+
+
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String token) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -54,6 +63,9 @@ public class ServerFacade {
             http.setDoOutput(true);
 
             writeBody(request, http);
+            if (!token.isEmpty()) {
+                addAuthorization(http, token);
+            }
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
@@ -70,6 +82,10 @@ public class ServerFacade {
                 reqBody.write(reqData.getBytes());
             }
         }
+    }
+
+    private void addAuthorization(HttpURLConnection http, String token) {
+        http.addRequestProperty("Authorization", token);
     }
 
     private static <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
