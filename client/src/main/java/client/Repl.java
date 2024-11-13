@@ -8,7 +8,6 @@ public class Repl {
     private ChessClient client;
     private String serverUrl;
     private String loginStatus;
-    private String token = null;
 
     public Repl(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -28,9 +27,10 @@ public class Repl {
             try {
                 result = client.eval(line);
                 if (result.contains("logged in") || result.contains("registered")) {
+                    String token = client.getToken();
                     client = new PostLoginClient(serverUrl);
                     loginStatus = "LOGGED_IN";
-                    token = client.getToken();
+                    client.setToken(token);
                 }
                 if (result.contains("logged out")) {
                     client = new PreLoginClient(serverUrl);

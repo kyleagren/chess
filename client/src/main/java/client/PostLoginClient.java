@@ -1,12 +1,17 @@
 package client;
 
 import exception.ResponseException;
+import model.GameData;
+import response.GameCreatedResponse;
+import response.GamesListResponse;
+import response.TruncatedGameData;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 public class PostLoginClient extends ChessClient {
     ServerFacade server;
-    String token = null;
 
     public PostLoginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -38,23 +43,49 @@ public class PostLoginClient extends ChessClient {
                 - logout
                 - create <gameName>
                 - list
-                - play <gameNumber> <color>
-                - observe <gameNumber> 
+                - play <gameNumber> <WHITE|BLACK>
+                - observe <gameNumber>
                 - quit
                 """;
     }
 
     public String logout(String... params) throws ResponseException {
-        server.logout(getToken());
-        return "";
+        try {
+            server.logout(getToken());
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
+        return "You have logged out successfully";
     }
 
-    public String createGame(String... params) {
-        return "";
+    public String createGame(String... params) throws ResponseException {
+        String gameName;
+        if (params.length >= 1) {
+            gameName = params[0];
+
+            // I actually don't like this at all, but I've kind of come too far to turn back now.
+            GameData game = new GameData(0, null, null, gameName, null);
+
+            try {
+                server.createGame(game, getToken());
+            } catch (ResponseException e) {
+                return e.getMessage();
+            }
+            return String.format("Game %s successfully created.", gameName);
+        }
+        throw new ResponseException(400, "Expected: <username> and <password>");
     }
 
-    public String listGames(String... params) {
-        return "";
+    public String listGames(String... params) throws ResponseException {
+        GamesListResponse response = server.listGames(getToken());
+        ArrayList<TruncatedGameData> games = response.listGames();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < games.size(); i++) {
+            TruncatedGameData currentGame = games.get(i);
+            builder.append(String.format("%d. %s: \n White player: %s\n Black player: %s", i,
+                    currentGame.gameName(), currentGame.whiteUsername(), currentGame.blackUsername()));
+        }
+        return builder.toString();
     }
 
     public String joinGame(String... params) {
