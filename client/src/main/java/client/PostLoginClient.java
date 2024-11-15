@@ -2,13 +2,11 @@ package client;
 
 import exception.ResponseException;
 import model.GameData;
-import response.GameCreatedResponse;
 import response.GamesListResponse;
 import response.TruncatedGameData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 public class PostLoginClient extends ChessClient {
     ServerFacade server;
@@ -73,17 +71,21 @@ public class PostLoginClient extends ChessClient {
             }
             return String.format("Game %s successfully created.", gameName);
         }
-        throw new ResponseException(400, "Expected: <username> and <password>");
+        throw new ResponseException(400, "Expected: <gameName>");
     }
 
     public String listGames(String... params) throws ResponseException {
         GamesListResponse response = server.listGames(getToken());
         ArrayList<TruncatedGameData> games = response.listGames();
         StringBuilder builder = new StringBuilder();
+        if (games.isEmpty()) {
+            return "No games";
+        }
         for (int i = 0; i < games.size(); i++) {
             TruncatedGameData currentGame = games.get(i);
-            builder.append(String.format("%d. %s: \n White player: %s\n Black player: %s", i,
-                    currentGame.gameName(), currentGame.whiteUsername(), currentGame.blackUsername()));
+            builder.append(String.format("%d. Game name: %s\n White player: %s\n Black player: %s", i + 1,
+                    currentGame.gameName(), currentGame.whiteUsername() != null ? currentGame.whiteUsername() : "None",
+                    currentGame.blackUsername() != null ? currentGame.whiteUsername() : "None"));
         }
         return builder.toString();
     }

@@ -17,7 +17,7 @@ public class Repl {
         client = new PreLoginClient(serverUrl);
         loginStatus = "LOGGED_OUT";
         System.out.println("Welcome to Chess. Sign in to start.");
-
+        System.out.println(client.help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while (!result.equals("quit")) {

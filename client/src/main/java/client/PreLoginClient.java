@@ -56,7 +56,7 @@ public class PreLoginClient extends ChessClient {
             }
             return String.format("You have logged in as %s.", username);
         }
-        throw new ResponseException(400, "Expected: <username> and <password>");
+        throw new ResponseException(400, "Expected: <username> <password>\n");
     }
 
     public String register(String... params) throws ResponseException {
@@ -70,13 +70,13 @@ public class PreLoginClient extends ChessClient {
 
             UserData data = new UserData(username, password, email);
             try {
-                AuthData auth = server.login(data);
+                AuthData auth = server.register(data);
                 setToken(auth.authToken());
             } catch (ResponseException e) {
                 return e.getMessage();
             }
             return String.format("You have registered as %s.", username);
         }
-        throw new ResponseException(400, "Expected: <username>");
+        throw new ResponseException(400, "Expected: <username> <password> <email>\n");
     }
 }
