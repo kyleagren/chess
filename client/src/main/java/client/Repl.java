@@ -36,6 +36,9 @@ public class Repl {
                     client = new PreLoginClient(serverUrl);
                     loginStatus = "LOGGED_OUT";
                 }
+                if (result.contains("successfully joined")) {
+                    client = new InGameClient(serverUrl);
+                }
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {
                 String message = e.toString();

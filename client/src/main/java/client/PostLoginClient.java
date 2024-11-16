@@ -3,13 +3,15 @@ package client;
 import exception.ResponseException;
 import model.GameData;
 import response.GamesListResponse;
+import response.JoinGameRequestBody;
 import response.TruncatedGameData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PostLoginClient extends ChessClient {
-    ServerFacade server;
+    private ServerFacade server;
+    private ArrayList<Integer> gameIdMap = new ArrayList<>();
 
     public PostLoginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -31,7 +33,7 @@ public class PostLoginClient extends ChessClient {
                 default -> help();
             };
         } catch (ResponseException e) {
-            return e.getMessage();
+            return "Something went wrong. Error: " + e.getMessage();
         }
     }
 
@@ -51,7 +53,7 @@ public class PostLoginClient extends ChessClient {
         try {
             server.logout(getToken());
         } catch (ResponseException e) {
-            return e.getMessage();
+            return "Failed to logout. Error: " + e.getMessage();
         }
         return "You have logged out successfully";
     }
@@ -67,7 +69,7 @@ public class PostLoginClient extends ChessClient {
             try {
                 server.createGame(game, getToken());
             } catch (ResponseException e) {
-                return e.getMessage();
+                return "Failed to create game. Error: " + e.getMessage();
             }
             return String.format("Game %s successfully created.", gameName);
         }
@@ -83,6 +85,9 @@ public class PostLoginClient extends ChessClient {
         }
         for (int i = 0; i < games.size(); i++) {
             TruncatedGameData currentGame = games.get(i);
+            if (gameIdMap.get(i) != currentGame.gameID()) {
+                gameIdMap.add(i, currentGame.gameID());
+            }
             builder.append(String.format("%d. Game name: %s\n White player: %s\n Black player: %s", i + 1,
                     currentGame.gameName(), currentGame.whiteUsername() != null ? currentGame.whiteUsername() : "None",
                     currentGame.blackUsername() != null ? currentGame.whiteUsername() : "None"));
@@ -90,11 +95,47 @@ public class PostLoginClient extends ChessClient {
         return builder.toString();
     }
 
-    public String joinGame(String... params) {
-        return "";
+    public String joinGame(String... params) throws ResponseException{
+        if (params.length >= 2) {
+            String gameNumber = params[0];
+            String color = params[1];
+            int convertedGameNumber = 0;
+
+            if (color.equals("BLACK" ) || color.equals("WHITE")) {
+                throw new ResponseException(400, "Invalid color");
+            }
+
+            try {
+                convertedGameNumber = Integer.parseInt(gameNumber);
+            } catch (NumberFormatException e) {
+                throw new ResponseException(400, "Invalid number");
+            }
+
+            JoinGameRequestBody request = new JoinGameRequestBody(color, convertedGameNumber);
+
+            try {
+                server.joinGame(request, getToken());
+            } catch (ResponseException e) {
+                return "Failed to join game. Error: " + e.getMessage();
+            }
+            return String.format("Game %s successfully joined as the %s player.", gameNumber, color);
+        }
+        throw new ResponseException(400, "Expected: <gameNumber> <color (WHITE | BLACK)>");
     }
 
-    public String observeGame(String... params) {
-        return "";
+    public String observeGame(String... params) throws ResponseException {
+        if (params.length >= 1) {
+            String gameNumber = params[0];
+            int convertedGameNumber = 0;
+
+            try {
+                convertedGameNumber = Integer.parseInt(gameNumber);
+            } catch (NumberFormatException e) {
+                throw new ResponseException(400, "Invalid number");
+            }
+
+            return String.format("Game %s successfully joined as an observer.", gameNumber);
+        }
+        throw new ResponseException(400, "Expected: <gameNumber>");
     }
 }
