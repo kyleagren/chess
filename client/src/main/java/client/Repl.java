@@ -38,6 +38,7 @@ public class Repl {
                 }
                 if (result.contains("successfully joined")) {
                     client = new InGameClient(serverUrl);
+                    InGameClient.redrawBoard();
                 }
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {

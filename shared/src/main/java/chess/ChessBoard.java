@@ -28,7 +28,7 @@ public class ChessBoard {
 
     private ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {
-
+        resetBoard();
     }
     public ChessBoard(ChessBoard board) {
         this.squares = new ChessPiece[8][8];
@@ -43,6 +43,11 @@ public class ChessBoard {
             }
         }
     }
+
+    public ChessPiece[][] getBoard() {
+        return squares;
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
