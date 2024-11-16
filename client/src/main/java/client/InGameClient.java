@@ -6,9 +6,9 @@ import chess.ChessPiece;
 import exception.ResponseException;
 import ui.EscapeSequences;
 
-import static ui.EscapeSequences.*;
-
 import java.util.Arrays;
+
+import static ui.EscapeSequences.*;
 
 public class InGameClient extends ChessClient {
     private ServerFacade server;
@@ -66,8 +66,18 @@ public class InGameClient extends ChessClient {
         for (int i = 0; i < boardRepresentation.length; i++) {
             ChessPiece.PieceType type;
             ChessGame.TeamColor color;
+
+            System.out.print(SET_BG_COLOR_DARK_GREY);
             System.out.print(i + 1);
+
             for (int j = 0; j < boardRepresentation.length; j++) {
+                if (j % 2 == 0) {
+                    System.out.print(SET_BG_COLOR_WHITE);
+                }
+                else {
+                    System.out.print(SET_BG_COLOR_BLACK);
+                }
+
                 if (boardRepresentation[i][j] != null) {
                     type = boardRepresentation[i][j].getPieceType();
                     color = boardRepresentation[i][j].getTeamColor();
@@ -86,8 +96,20 @@ public class InGameClient extends ChessClient {
                         case ChessPiece.PieceType.PAWN  -> System.out.print(WHITE_PAWN);
                     }
                 }
-
+                else if (color == ChessGame.TeamColor.BLACK) {
+                    switch (type) {
+                        case ChessPiece.PieceType.QUEEN -> System.out.print(BLACK_QUEEN);
+                        case ChessPiece.PieceType.KING -> System.out.print(BLACK_KING);
+                        case ChessPiece.PieceType.BISHOP -> System.out.print(BLACK_BISHOP);
+                        case ChessPiece.PieceType.KNIGHT -> System.out.print(BLACK_KNIGHT);
+                        case ChessPiece.PieceType.ROOK -> System.out.print(BLACK_ROOK);
+                        case ChessPiece.PieceType.PAWN -> System.out.print(BLACK_PAWN);
+                    }
+                }
             }
+            System.out.print(SET_BG_COLOR_DARK_GREY);
+            System.out.print(i + 1);
+            System.out.println(SET_BG_COLOR_BLACK);
         }
     }
 
