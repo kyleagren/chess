@@ -121,7 +121,7 @@ public class PostLoginClient extends ChessClient {
                 return EscapeSequences.SET_TEXT_COLOR_RED + "Invalid game number.";
             }
             System.out.print(convertedGameNumber);
-            JoinGameRequestBody request = new JoinGameRequestBody(color, convertedGameNumber);
+            JoinGameRequestBody request = new JoinGameRequestBody(color.toUpperCase(), convertedGameNumber);
 
             try {
                 server.joinGame(request, getToken());

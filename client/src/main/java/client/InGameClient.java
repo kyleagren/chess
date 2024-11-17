@@ -27,6 +27,7 @@ public class InGameClient extends ChessClient {
             return switch (cmd) {
                 case "quit" -> "quit";
                 case "redraw" -> redrawBoard(params);
+                case "leave" -> leaveGame(params);
                 default -> help();
             };
         } catch (Exception e) {
@@ -169,5 +170,9 @@ public class InGameClient extends ChessClient {
                 }
             }
         }
+    }
+
+    private String leaveGame(String... params) {
+        return "leave";
     }
 }

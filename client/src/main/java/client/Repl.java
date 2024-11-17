@@ -48,7 +48,10 @@ public class Repl {
                     client = new InGameClient(serverUrl);
                     client.eval("redraw");
                 }
-
+                if (result.contains("leave")) {
+                    client = new PreLoginClient(serverUrl);
+                    needsHelp = true;
+                }
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_MAGENTA + result);
 
                 if (needsHelp) {
