@@ -3,6 +3,7 @@ package client;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
+import ui.EscapeSequences;
 
 import java.util.Arrays;
 
@@ -32,7 +33,7 @@ public class PreLoginClient extends ChessClient {
 
     @Override
     public String help() {
-        return """
+        return EscapeSequences.SET_TEXT_COLOR_GREEN + """
                 - register <username> <password> <email>
                 - login <username> <password>
                 - quit
@@ -52,7 +53,7 @@ public class PreLoginClient extends ChessClient {
                 AuthData auth = server.login(data);
                 setToken(auth.authToken());
             } catch (ResponseException e) {
-                return e.getMessage();
+                return EscapeSequences.SET_TEXT_COLOR_RED + "Invalid username or password";
             }
             return String.format("You have logged in as %s.", username);
         }
@@ -73,7 +74,7 @@ public class PreLoginClient extends ChessClient {
                 AuthData auth = server.register(data);
                 setToken(auth.authToken());
             } catch (ResponseException e) {
-                return e.getMessage();
+                return EscapeSequences.SET_TEXT_COLOR_RED + "Username or password unavailable";
             }
             return String.format("You have registered as %s.", username);
         }

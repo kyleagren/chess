@@ -5,6 +5,7 @@ import model.GameData;
 import response.GamesListResponse;
 import response.JoinGameRequestBody;
 import response.TruncatedGameData;
+import ui.EscapeSequences;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,13 +34,13 @@ public class PostLoginClient extends ChessClient {
                 default -> help();
             };
         } catch (ResponseException e) {
-            return "Something went wrong. Error: " + e.getMessage();
+            return e.getMessage();
         }
     }
 
     @Override
     public String help() {
-        return """
+        return EscapeSequences.SET_TEXT_COLOR_GREEN + """
                 - logout
                 - create <gameName>
                 - list
@@ -85,10 +86,11 @@ public class PostLoginClient extends ChessClient {
         }
         for (int i = 0; i < games.size(); i++) {
             TruncatedGameData currentGame = games.get(i);
-            if (gameIdMap.get(i) != currentGame.gameID()) {
+            if (gameIdMap.size() < games.size()) {
                 gameIdMap.add(i, currentGame.gameID());
             }
-            builder.append(String.format("%d. Game name: %s\n White player: %s\n Black player: %s", i + 1,
+
+            builder.append(String.format("%d. Game name: %s\n White player: %s\n Black player: %s\n", i + 1,
                     currentGame.gameName(), currentGame.whiteUsername() != null ? currentGame.whiteUsername() : "None",
                     currentGame.blackUsername() != null ? currentGame.whiteUsername() : "None"));
         }
@@ -101,22 +103,30 @@ public class PostLoginClient extends ChessClient {
             String color = params[1];
             int convertedGameNumber = 0;
 
-            if (color.equals("BLACK" ) || color.equals("WHITE")) {
-                throw new ResponseException(400, "Invalid color");
+            if (!color.equals("black") && !color.equals("white")) {
+                return EscapeSequences.SET_TEXT_COLOR_RED + "Invalid color.";
             }
 
             try {
-                convertedGameNumber = Integer.parseInt(gameNumber);
+                int parsedNumber = (Integer.parseInt(gameNumber));
+                for (Integer integer : gameIdMap) {
+                    if (integer == parsedNumber) {
+                        convertedGameNumber = integer;
+                    }
+                }
+                if (convertedGameNumber == 0) {
+                    return EscapeSequences.SET_TEXT_COLOR_RED + "Invalid game number.";
+                }
             } catch (NumberFormatException e) {
-                throw new ResponseException(400, "Invalid number");
+                return EscapeSequences.SET_TEXT_COLOR_RED + "Invalid game number.";
             }
-
+            System.out.print(convertedGameNumber);
             JoinGameRequestBody request = new JoinGameRequestBody(color, convertedGameNumber);
 
             try {
                 server.joinGame(request, getToken());
             } catch (ResponseException e) {
-                return "Failed to join game. Error: " + e.getMessage();
+                return EscapeSequences.SET_TEXT_COLOR_RED + "Game does not exist.";
             }
             return String.format("Game %s successfully joined as the %s player.", gameNumber, color);
         }
