@@ -30,7 +30,6 @@ public class PostLoginClient extends ChessClient {
                 case "list" -> listGames(params);
                 case "play" -> joinGame(params);
                 case "observe" -> observeGame(params);
-                case "quit" -> "quit";
                 default -> help();
             };
         } catch (ResponseException e) {
@@ -46,7 +45,7 @@ public class PostLoginClient extends ChessClient {
                 - list
                 - play <gameNumber> <WHITE|BLACK>
                 - observe <gameNumber>
-                - quit
+                - help
                 """;
     }
 
@@ -78,6 +77,7 @@ public class PostLoginClient extends ChessClient {
     }
 
     public String listGames(String... params) throws ResponseException {
+        gameIdMap = new ArrayList<>();
         GamesListResponse response = server.listGames(getToken());
         ArrayList<TruncatedGameData> games = response.listGames();
         StringBuilder builder = new StringBuilder();

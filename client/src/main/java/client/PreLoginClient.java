@@ -36,6 +36,7 @@ public class PreLoginClient extends ChessClient {
         return EscapeSequences.SET_TEXT_COLOR_GREEN + """
                 - register <username> <password> <email>
                 - login <username> <password>
+                - help
                 - quit
                 """;
     }

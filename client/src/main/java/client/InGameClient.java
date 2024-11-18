@@ -24,7 +24,6 @@ public class InGameClient extends ChessClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "quit" -> "quit";
                 case "redraw" -> redrawBoard(params);
                 case "leave" -> leaveGame(params);
                 default -> help();
@@ -39,7 +38,6 @@ public class InGameClient extends ChessClient {
     public String help() {
         return EscapeSequences.SET_TEXT_COLOR_GREEN + """
                 - redraw
-                - quit
                 """;
     }
 
