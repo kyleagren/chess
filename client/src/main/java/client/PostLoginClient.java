@@ -30,7 +30,7 @@ public class PostLoginClient extends ChessClient {
                 case "list" -> listGames(params);
                 case "play" -> joinGame(params);
                 case "observe" -> observeGame(params);
-                case "clear" -> clear();
+//                case "clear" -> clear();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -87,7 +87,6 @@ public class PostLoginClient extends ChessClient {
         }
         for (int i = 0; i < games.size(); i++) {
             TruncatedGameData currentGame = games.get(i);
-            System.out.print(gameIdMap.size() + " " +  games.size());
             if (gameIdMap.size() < games.size()) {
                 gameIdMap.add(i, currentGame.gameID());
             }
@@ -155,8 +154,8 @@ public class PostLoginClient extends ChessClient {
         throw new ResponseException(400, "Expected: <gameNumber>");
     }
 
-    public String clear(String... params) throws ResponseException {
-        server.clear();
-        return "cleared";
-    }
+//    public String clear(String... params) throws ResponseException {
+//        server.clear();
+//        return "cleared";
+//    }
 }

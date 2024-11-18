@@ -11,8 +11,7 @@ import static ui.EscapeSequences.*;
 
 public class InGameClient extends ChessClient {
     private ServerFacade server;
-    ChessBoard board = new ChessBoard(); // refactor to get the board from the db
-//    int[][] boardRepresentation = new int[8][8];
+    ChessBoard board = new ChessBoard(true);
 
     public InGameClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -46,6 +45,7 @@ public class InGameClient extends ChessClient {
 
     public String redrawBoard(String... params) {
         String defaultColor = "WHITE"; // Observers will be drawn from white point of view.
+
         System.out.print(SET_TEXT_COLOR_BLACK);
         drawWhiteBoard();
         System.out.println();
@@ -113,12 +113,12 @@ public class InGameClient extends ChessClient {
 
         for (int i = 0; i < boardRepresentation.length; i++) {
             System.out.print(SET_BG_COLOR_YELLOW);
-            System.out.print(" " + (boardRepresentation.length - i) + " ");
+            System.out.print(" " + (i + 1) + " ");
 
             drawBoard(boardRepresentation, i, ChessGame.TeamColor.BLACK);
 
             System.out.print(SET_BG_COLOR_YELLOW);
-            System.out.print(" " + (boardRepresentation.length - i) + " ");
+            System.out.print(" " + (i + 1) + " ");
             System.out.println(SET_BG_COLOR_BLACK);
         }
 
@@ -163,8 +163,14 @@ public class InGameClient extends ChessClient {
                 continue;
             }
             else {
-                type = boardRepresentation[i][j].getPieceType();
-                color = boardRepresentation[i][j].getTeamColor();
+                if (colorToDraw == ChessGame.TeamColor.WHITE) {
+                    type = boardRepresentation[i][j].getPieceType();
+                    color = boardRepresentation[i][j].getTeamColor();
+                }
+                else {
+                    type = boardRepresentation[i][(boardRepresentation.length - 1) - j].getPieceType();
+                    color = boardRepresentation[i][(boardRepresentation.length - 1) - j].getTeamColor();
+                }
             }
             if (color == ChessGame.TeamColor.WHITE) {
                 switch (type) {

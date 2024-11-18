@@ -49,6 +49,7 @@ public class Repl {
                     client = new InGameClient(serverUrl);
                     client.setToken(token);
                     client.eval("redraw");
+                    needsHelp = true;
                 }
                 if (result.contains("leave")) {
                     String token = client.getToken();
