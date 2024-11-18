@@ -30,6 +30,7 @@ public class PostLoginClient extends ChessClient {
                 case "list" -> listGames(params);
                 case "play" -> joinGame(params);
                 case "observe" -> observeGame(params);
+                case "clear" -> clear();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -86,13 +87,14 @@ public class PostLoginClient extends ChessClient {
         }
         for (int i = 0; i < games.size(); i++) {
             TruncatedGameData currentGame = games.get(i);
+            System.out.print(gameIdMap.size() + " " +  games.size());
             if (gameIdMap.size() < games.size()) {
                 gameIdMap.add(i, currentGame.gameID());
             }
 
             builder.append(String.format("%d. Game name: %s\n White player: %s\n Black player: %s\n", i + 1,
                     currentGame.gameName(), currentGame.whiteUsername() != null ? currentGame.whiteUsername() : "None",
-                    currentGame.blackUsername() != null ? currentGame.whiteUsername() : "None"));
+                    currentGame.blackUsername() != null ? currentGame.blackUsername() : "None"));
         }
         return builder.toString();
     }
@@ -108,24 +110,28 @@ public class PostLoginClient extends ChessClient {
             }
 
             try {
-                int parsedNumber = (Integer.parseInt(gameNumber));
-                for (Integer integer : gameIdMap) {
-                    if (integer == parsedNumber) {
-                        convertedGameNumber = integer;
-                    }
+                int parsedNumber = (Integer.parseInt(gameNumber) > 0 ? Integer.parseInt(gameNumber) - 1 : 0);
+                if (parsedNumber < gameIdMap.size()) {
+                    convertedGameNumber = gameIdMap.get(parsedNumber);
                 }
                 if (convertedGameNumber == 0) {
                     return EscapeSequences.SET_TEXT_COLOR_RED + "Invalid game number.";
                 }
-            } catch (NumberFormatException e) {
+            } catch (Exception e) {
                 return EscapeSequences.SET_TEXT_COLOR_RED + "Invalid game number.";
             }
-            System.out.print(convertedGameNumber);
+
             JoinGameRequestBody request = new JoinGameRequestBody(color.toUpperCase(), convertedGameNumber);
 
             try {
                 server.joinGame(request, getToken());
             } catch (ResponseException e) {
+                if (e.getMessage().contains("403")) {
+                    return EscapeSequences.SET_TEXT_COLOR_RED + "Color is already taken.";
+                }
+                else if (e.getMessage().contains("401")) {
+                    return EscapeSequences.SET_TEXT_COLOR_RED + "Unauthorized";
+                }
                 return EscapeSequences.SET_TEXT_COLOR_RED + "Game does not exist.";
             }
             return String.format("Game %s successfully joined as the %s player.", gameNumber, color);
@@ -147,5 +153,10 @@ public class PostLoginClient extends ChessClient {
             return String.format("Game %s successfully joined as an observer.", gameNumber);
         }
         throw new ResponseException(400, "Expected: <gameNumber>");
+    }
+
+    public String clear(String... params) throws ResponseException {
+        server.clear();
+        return "cleared";
     }
 }

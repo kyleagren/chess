@@ -46,108 +46,125 @@ public class InGameClient extends ChessClient {
 
     public String redrawBoard(String... params) {
         String defaultColor = "WHITE"; // Observers will be drawn from white point of view.
+        System.out.print(SET_TEXT_COLOR_BLACK);
         drawWhiteBoard();
+        System.out.println();
         drawBlackBoard();
+        System.out.println();
         return "";
     }
 
     private void drawWhiteBoard() {
         ChessPiece[][] boardRepresentation = board.getBoard();
 
-        System.out.print(SET_BG_COLOR_DARK_GREY);
-        System.out.print(" ");
-        System.out.print("h");
-        System.out.print("g");
-        System.out.print("f");
-        System.out.print("e");
-        System.out.print("d");
-        System.out.print("c");
-        System.out.print("b");
-        System.out.print("a");
-        System.out.print(" ");
+        System.out.print(SET_BG_COLOR_YELLOW);
+        System.out.print(EMPTY);
+        System.out.print(" a ");
+        System.out.print(" b  ");
+        System.out.print(" c  ");
+        System.out.print(" d ");
+        System.out.print(" e  ");
+        System.out.print(" f ");
+        System.out.print(" g  ");
+        System.out.print(" h ");
+        System.out.print(EMPTY);
         System.out.println(SET_BG_COLOR_BLACK);
 
-        for (int i = 0; i < boardRepresentation.length; i++) {
-            System.out.print(SET_BG_COLOR_DARK_GREY);
-            System.out.print(i + 1);
+        for (int i = boardRepresentation.length - 1; i >= 0; i--) {
+            System.out.print(SET_BG_COLOR_YELLOW);
+            System.out.print(" " + (i + 1) + " ");
 
-            drawBoard(boardRepresentation);
+            drawBoard(boardRepresentation, i, ChessGame.TeamColor.WHITE);
 
-            System.out.print(SET_BG_COLOR_DARK_GREY);
-            System.out.print(i + 1);
+            System.out.print(SET_BG_COLOR_YELLOW);
+            System.out.print(" " + (i + 1) + " ");
             System.out.println(SET_BG_COLOR_BLACK);
         }
 
-        System.out.print(" ");
-        System.out.print("h");
-        System.out.print("g");
-        System.out.print("f");
-        System.out.print("e");
-        System.out.print("d");
-        System.out.print("c");
-        System.out.print("b");
-        System.out.print("a");
-        System.out.print(" ");
+        System.out.print(SET_BG_COLOR_YELLOW);
+        System.out.print(EMPTY);
+        System.out.print(" a ");
+        System.out.print(" b  ");
+        System.out.print(" c  ");
+        System.out.print(" d ");
+        System.out.print(" e  ");
+        System.out.print(" f ");
+        System.out.print(" g  ");
+        System.out.print(" h ");
+        System.out.print(EMPTY);
+        System.out.println(SET_BG_COLOR_BLACK);
     }
 
     private void drawBlackBoard() {
         ChessPiece[][] boardRepresentation = board.getBoard();
 
-        System.out.print(SET_BG_COLOR_DARK_GREY);
-        System.out.print(" ");
-        System.out.print("a");
-        System.out.print("b");
-        System.out.print("c");
-        System.out.print("d");
-        System.out.print("e");
-        System.out.print("f");
-        System.out.print("g");
-        System.out.print("h");
-        System.out.print(" ");
+        System.out.print(SET_BG_COLOR_YELLOW);
+        System.out.print(EMPTY);
+        System.out.print(" h ");
+        System.out.print(" g  ");
+        System.out.print(" f  ");
+        System.out.print(" e ");
+        System.out.print(" d  ");
+        System.out.print(" c ");
+        System.out.print(" b  ");
+        System.out.print(" a ");
+        System.out.print(EMPTY);
         System.out.println(SET_BG_COLOR_BLACK);
 
         for (int i = 0; i < boardRepresentation.length; i++) {
-            System.out.print(SET_BG_COLOR_DARK_GREY);
-            System.out.print(boardRepresentation.length - i);
+            System.out.print(SET_BG_COLOR_YELLOW);
+            System.out.print(" " + (boardRepresentation.length - i) + " ");
 
-            drawBoard(boardRepresentation);
+            drawBoard(boardRepresentation, i, ChessGame.TeamColor.BLACK);
 
-            System.out.print(SET_BG_COLOR_DARK_GREY);
-            System.out.print(boardRepresentation.length - i);
+            System.out.print(SET_BG_COLOR_YELLOW);
+            System.out.print(" " + (boardRepresentation.length - i) + " ");
             System.out.println(SET_BG_COLOR_BLACK);
         }
 
-        System.out.print(" ");
-        System.out.print("a");
-        System.out.print("b");
-        System.out.print("c");
-        System.out.print("d");
-        System.out.print("e");
-        System.out.print("f");
-        System.out.print("g");
-        System.out.print("h");
-        System.out.print(" ");
+        System.out.print(SET_BG_COLOR_YELLOW);
+        System.out.print(EMPTY);
+        System.out.print(" h ");
+        System.out.print(" g  ");
+        System.out.print(" f  ");
+        System.out.print(" e ");
+        System.out.print(" d  ");
+        System.out.print(" c ");
+        System.out.print(" b  ");
+        System.out.print(" a ");
+        System.out.print(EMPTY);
+        System.out.println(SET_BG_COLOR_BLACK);
     }
 
-    private void drawBoard(ChessPiece[][] boardRepresentation) {
+    private void drawBoard(ChessPiece[][] boardRepresentation, int i, ChessGame.TeamColor colorToDraw) {
         ChessPiece.PieceType type;
         ChessGame.TeamColor color;
 
-        for (int i = 0; i < boardRepresentation.length; i++) {
-            if (i % 2 == 0) {
-                System.out.print(SET_BG_COLOR_WHITE);
+        for (int j = 0; j < boardRepresentation.length; j++) {
+            if (colorToDraw == ChessGame.TeamColor.WHITE) {
+                if ((i + j) % 2 != 0) {
+                    System.out.print(SET_BG_COLOR_WHITE);
+                }
+                else {
+                    System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                }
             }
             else {
-                System.out.print(SET_BG_COLOR_BLACK);
+                if ((i + j) % 2 == 0) {
+                    System.out.print(SET_BG_COLOR_WHITE);
+                }
+                else {
+                    System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                }
             }
 
-            if (boardRepresentation[i][i] == null) {
+            if (boardRepresentation[i][j] == null) {
                 System.out.print(EMPTY);
                 continue;
             }
             else {
-                type = boardRepresentation[i][i].getPieceType();
-                color = boardRepresentation[i][i].getTeamColor();
+                type = boardRepresentation[i][j].getPieceType();
+                color = boardRepresentation[i][j].getTeamColor();
             }
             if (color == ChessGame.TeamColor.WHITE) {
                 switch (type) {

@@ -45,11 +45,15 @@ public class Repl {
                     needsHelp = true;
                 }
                 if (result.contains("successfully joined")) {
+                    String token = client.getToken();
                     client = new InGameClient(serverUrl);
+                    client.setToken(token);
                     client.eval("redraw");
                 }
                 if (result.contains("leave")) {
-                    client = new PreLoginClient(serverUrl);
+                    String token = client.getToken();
+                    client = new PostLoginClient(serverUrl);
+                    client.setToken(token);
                     needsHelp = true;
                 }
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_MAGENTA + result);
