@@ -27,6 +27,7 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
+        Spark.get("/games", this::getGame);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -58,6 +59,10 @@ public class Server {
 
     public Object clear(Request req, Response res) {
         return this.handler.clear(req, res);
+    }
+
+    public Object getGame(Request req, Response res) {
+        return this.handler.getGame(req, res);
     }
 
     public void stop() {

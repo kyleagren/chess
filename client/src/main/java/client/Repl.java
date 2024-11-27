@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import ui.EscapeSequences;
 
 import java.util.Scanner;
@@ -45,9 +46,31 @@ public class Repl {
                     needsHelp = true;
                 }
                 if (result.contains("successfully joined")) {
+                    var tokens = result.toLowerCase().split(" ");
+                    int gameNumber = Integer.parseInt(tokens[1]);
                     String token = client.getToken();
-                    client = new InGameClient(serverUrl);
+                    String currentColor = null;
+                    ChessGame game = client.getGame();
+                    if (result.contains("white")) {
+                        currentColor = "white";
+                    }
+                    else if (result.contains("black")) {
+                        currentColor = "black";
+                    }
+                    client = new InGameClient(serverUrl, currentColor, gameNumber);
                     client.setToken(token);
+                    client.setGame(game);
+                    client.eval("redraw");
+                    needsHelp = true;
+                }
+                if (result.contains("observer")) {
+                    var tokens = result.toLowerCase().split(" ");
+                    int gameNumber = Integer.parseInt(tokens[1]);
+                    String token = client.getToken();
+                    ChessGame game = client.getGame();
+                    client = new InGameClient(serverUrl, null, gameNumber);
+                    client.setToken(token);
+                    client.setGame(game);
                     client.eval("redraw");
                     needsHelp = true;
                 }

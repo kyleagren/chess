@@ -53,4 +53,10 @@ public class ServerFacade {
         var path = "/db";
         return communicator.makeRequest("DELETE", path, null, EmptySuccessResponse.class, "");
     }
+
+    public GameData getGame(int gameID) throws ResponseException {
+        var path = "/games";
+        return communicator.makeRequest("GET", path, null, GameData.class, "");
+
+    }
 }

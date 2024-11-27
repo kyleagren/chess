@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import response.EmptySuccessResponse;
-import response.ErrorResponse;
-import response.GameCreatedResponse;
-import response.JoinGameRequestBody;
+import response.*;
 import service.AuthService;
 import service.GameService;
 import spark.*;
@@ -167,6 +164,18 @@ public class Handler {
         authService.deleteAll();
         gameService.deleteAll();
         return new Gson().toJson(new EmptySuccessResponse());
+    }
+
+    public Object getGame(Request req, Response res) {
+        String token = req.headers("Authorization");
+        res.type("application/json");
+        var gameData = getBody(req, GetGameRequestBody.class);
+        try {
+            GameData result = gameService.getGame(gameData.gameID());
+            return new Gson().toJson(result);
+        } catch (Exception e) {
+            return exceptionHandler(e, res);
+        }
     }
 
     private static <T> T getBody(Request request, Class<T> classType) {

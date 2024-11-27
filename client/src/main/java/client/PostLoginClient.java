@@ -132,6 +132,7 @@ public class PostLoginClient extends ChessClient {
                 }
                 return EscapeSequences.SET_TEXT_COLOR_RED + "Game does not exist.";
             }
+            setGame(server.getGame(convertedGameNumber).game());
             return String.format("Game %s successfully joined as the %s player.", gameNumber, color);
         }
         throw new ResponseException(400, "Expected: <gameNumber> <color (WHITE | BLACK)>");
@@ -147,7 +148,7 @@ public class PostLoginClient extends ChessClient {
             } catch (NumberFormatException e) {
                 throw new ResponseException(400, "Invalid number");
             }
-
+            setGame(server.getGame(convertedGameNumber).game());
             return String.format("Game %s successfully joined as an observer.", gameNumber);
         }
         throw new ResponseException(400, "Expected: <gameNumber>");

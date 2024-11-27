@@ -11,10 +11,12 @@ import static ui.EscapeSequences.*;
 
 public class InGameClient extends ChessClient {
     private ServerFacade server;
+    private String playerColor;
     ChessBoard board = new ChessBoard(true);
 
-    public InGameClient(String serverUrl) {
+    public InGameClient(String serverUrl, String color, int gameNumber) {
         server = new ServerFacade(serverUrl);
+        playerColor = color;
     }
 
     @Override
@@ -26,6 +28,9 @@ public class InGameClient extends ChessClient {
             return switch (cmd) {
                 case "redraw" -> redrawBoard(params);
                 case "leave" -> leaveGame(params);
+                case "move" -> makeMove(params);
+                case "resign" -> resign(params);
+                case "highlight" -> highlightPossibleMoves(params);
                 default -> help();
             };
         } catch (Exception e) {
@@ -37,18 +42,27 @@ public class InGameClient extends ChessClient {
     @Override
     public String help() {
         return EscapeSequences.SET_TEXT_COLOR_GREEN + """
+                - help
                 - redraw
+                - move (start and end position for the preferred move) <LETTER><NUMBER> -> <LETTER><NUMBER>
+                - resign (forfeits the game, ending it)
+                - leave (leaves the game, but allows position to be filled by another player)
+                - highlight (highlights valid moves for given position) <LETTER><NUMBER>
                 """;
     }
 
     public String redrawBoard(String... params) {
         String defaultColor = "WHITE"; // Observers will be drawn from white point of view.
-
-        System.out.print(SET_TEXT_COLOR_BLACK);
-        drawWhiteBoard();
-        System.out.println();
-        drawBlackBoard();
-        System.out.println();
+        if (playerColor.equals("black")) {
+            System.out.print(SET_TEXT_COLOR_BLACK);
+            drawBlackBoard();
+            System.out.println();
+        }
+        else {
+            System.out.print(SET_TEXT_COLOR_BLACK);
+            drawWhiteBoard();
+            System.out.println();
+        }
         return "";
     }
 
@@ -195,5 +209,17 @@ public class InGameClient extends ChessClient {
 
     private String leaveGame(String... params) {
         return "leave";
+    }
+
+    private String makeMove(String... params) {
+
+    }
+
+    private String resign(String... params) {
+
+    }
+
+    private String highlightPossibleMoves(String... params) {
+
     }
 }

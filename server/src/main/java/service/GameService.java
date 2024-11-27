@@ -4,6 +4,7 @@ import dataaccess.DataAccessException;
 import dataaccess.GameDataAccess;
 import dataaccess.GameDataAccessMySQL;
 import model.AuthData;
+import model.GameData;
 import response.EmptySuccessResponse;
 import response.GameCreatedResponse;
 import response.GamesListResponse;
@@ -71,5 +72,9 @@ public class GameService {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public GameData getGame(int gameID) throws DataAccessException {
+        return gameDataAccess.getGame(gameID);
     }
 }
