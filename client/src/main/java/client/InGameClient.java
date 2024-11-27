@@ -12,7 +12,6 @@ import static ui.EscapeSequences.*;
 public class InGameClient extends ChessClient {
     private ServerFacade server;
     private String playerColor;
-    ChessBoard board = new ChessBoard(true);
 
     public InGameClient(String serverUrl, String color, int gameNumber) {
         server = new ServerFacade(serverUrl);
@@ -67,7 +66,7 @@ public class InGameClient extends ChessClient {
     }
 
     private void drawWhiteBoard() {
-        ChessPiece[][] boardRepresentation = board.getBoard();
+        ChessPiece[][] boardRepresentation = getGame().getBoard().getBoard();
 
         System.out.print(SET_BG_COLOR_YELLOW);
         System.out.print(EMPTY);
@@ -108,7 +107,7 @@ public class InGameClient extends ChessClient {
     }
 
     private void drawBlackBoard() {
-        ChessPiece[][] boardRepresentation = board.getBoard();
+        ChessPiece[][] boardRepresentation = getGame().getBoard().getBoard();
 
         System.out.print(SET_BG_COLOR_YELLOW);
         System.out.print(EMPTY);
@@ -212,14 +211,14 @@ public class InGameClient extends ChessClient {
     }
 
     private String makeMove(String... params) {
-
+        return "";
     }
 
     private String resign(String... params) {
-
+        return "";
     }
 
     private String highlightPossibleMoves(String... params) {
-
+        return "";
     }
 }
