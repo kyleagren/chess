@@ -2,13 +2,15 @@ package client;
 
 import chess.ChessGame;
 import ui.EscapeSequences;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
-public class Repl {
+public class Repl implements ServerMessageObserver {
     private ChessClient client;
     private String serverUrl;
     private String loginStatus;
+    private String username;
 
     public Repl(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -34,6 +36,8 @@ public class Repl {
                 result = client.eval(line);
 
                 if (result.contains("logged in") || result.contains("registered")) {
+                    var tokens = result.toLowerCase().split(" ");
+                    username = tokens[tokens.length - 1];
                     String token = client.getToken();
                     client = new PostLoginClient(serverUrl);
                     loginStatus = "LOGGED_IN";
@@ -41,6 +45,7 @@ public class Repl {
                     needsHelp = true;
                 }
                 if (result.contains("logged out")) {
+                    username = null;
                     client = new PreLoginClient(serverUrl);
                     loginStatus = "LOGGED_OUT";
                     needsHelp = true;
@@ -57,7 +62,7 @@ public class Repl {
                     else if (result.contains("black")) {
                         currentColor = "black";
                     }
-                    client = new InGameClient(serverUrl, currentColor, gameNumber);
+                    client = new InGameClient(serverUrl, this, username, currentColor, gameNumber);
                     client.setToken(token);
                     client.setGame(game);
                     client.eval("redraw");
@@ -68,7 +73,7 @@ public class Repl {
                     int gameNumber = Integer.parseInt(tokens[1]);
                     String token = client.getToken();
                     ChessGame game = client.getGame();
-                    client = new InGameClient(serverUrl, null, gameNumber);
+                    client = new InGameClient(serverUrl, this, null,null, gameNumber);
                     client.setToken(token);
                     client.setGame(game);
                     client.eval("redraw");
@@ -100,5 +105,11 @@ public class Repl {
                 EscapeSequences.SET_TEXT_COLOR_BLUE) +
                 "\n[" + loginStatus + "]" +
                 EscapeSequences.RESET_BG_COLOR + ">>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
+    }
+
+    @Override
+    public void notifyWS(ServerMessage message) {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + message);
+        printPrompt();
     }
 }

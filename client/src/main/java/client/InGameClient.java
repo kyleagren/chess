@@ -3,7 +3,9 @@ package client;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
+import exception.ResponseException;
 import ui.EscapeSequences;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 
@@ -12,10 +14,19 @@ import static ui.EscapeSequences.*;
 public class InGameClient extends ChessClient {
     private ServerFacade server;
     private String playerColor;
+    private ServerMessageObserver observer;
+    private WebSocketCommunicator ws;
+    private String username;
 
-    public InGameClient(String serverUrl, String color, int gameNumber) {
+    public InGameClient(String serverUrl, ServerMessageObserver observer, String username, String color, int gameNumber) throws ResponseException {
         server = new ServerFacade(serverUrl);
         playerColor = color;
+        this.observer = observer;
+        this.ws = new WebSocketCommunicator(serverUrl, observer);
+        this.username = username;
+        if (playerColor != null) {
+            ws.joinGame(username, color);
+        }
     }
 
     @Override
@@ -206,7 +217,9 @@ public class InGameClient extends ChessClient {
         }
     }
 
-    private String leaveGame(String... params) {
+    private String leaveGame(String... params) throws ResponseException {
+        ws.leaveGame(username);
+        ws = null;
         return "leave";
     }
 
