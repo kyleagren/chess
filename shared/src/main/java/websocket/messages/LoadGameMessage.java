@@ -4,8 +4,13 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 
 public class LoadGameMessage extends ServerMessage {
+    ChessGame game;
     public LoadGameMessage(ChessGame game) {
         super(ServerMessageType.LOAD_GAME);
-        setMessageText(new Gson().toJson(game, ChessGame.class));
+        this.game = game;
+    }
+
+    public ChessGame getGame() {
+        return game;
     }
 }

@@ -1,10 +1,8 @@
 package client;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.Notification;
+import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -27,10 +25,13 @@ public class WebSocketCommunicator extends Endpoint {
 
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
-                public void onMessage(String message) {
-                    ChessGame game = new Gson().fromJson(message, ChessGame.class);
-                    ServerMessage notification = new LoadGameMessage(game);
-                    observer.notifyWS(notification);
+                public void onMessage(String incomingMessage) {
+                    try {
+                        ServerMessage message = new Gson().fromJson(incomingMessage, ServerMessage.class);
+                        observer.notify(message);
+                    } catch(Exception ex) {
+                        observer.notify(new ErrorMessage(ex.getMessage()));
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {

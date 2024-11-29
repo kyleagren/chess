@@ -9,7 +9,6 @@ import java.util.Objects;
  * methods.
  */
 public class UserGameCommand {
-    private String username;
     private String color;
 
     private final CommandType commandType;
@@ -24,11 +23,10 @@ public class UserGameCommand {
         this.gameID = gameID;
     }
 
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, String username, String color) {
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, String color) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
-        this.username = username;
         this.color = color;
     }
 
@@ -38,7 +36,6 @@ public class UserGameCommand {
         LEAVE,
         RESIGN
     }
-    public String getUsername() { return username; };
 
     public String getColor() { return color; }
 

@@ -2,6 +2,9 @@ package client;
 
 import chess.ChessGame;
 import ui.EscapeSequences;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -108,8 +111,26 @@ public class Repl implements ServerMessageObserver {
     }
 
     @Override
-    public void notifyWS(ServerMessage message) {
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification(((Notification) message).getMessageText());
+            case ERROR -> displayError((message).getMessageText());
+            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+        }
+    }
+
+    private void displayNotification(String message) {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + message);
         printPrompt();
+    }
+
+    private void displayError(String message) {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + message);
+        printPrompt();
+    }
+
+    private void loadGame(ChessGame game) {
+        client.setGame(game);
+        client.eval("redraw");
     }
 }

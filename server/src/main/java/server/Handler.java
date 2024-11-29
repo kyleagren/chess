@@ -5,6 +5,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import response.*;
+import server.websocket.WebSocketHandler;
 import service.AuthService;
 import service.GameService;
 import spark.*;
@@ -14,6 +15,7 @@ public class Handler {
     private final UserService userService = new UserService();
     private final GameService gameService = new GameService();
     private final AuthService authService = new AuthService();
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
 
     public Object register(Request req, Response res) {
         var userData = getBody(req, UserData.class);

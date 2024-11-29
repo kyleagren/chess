@@ -16,14 +16,23 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+        String username = getUsername(command.getAuthToken());
         switch (command.getCommandType()) {
-            case UserGameCommand.CommandType.CONNECT -> connect(command.getUsername(), command.getColor(), session);
+            case UserGameCommand.CommandType.CONNECT -> connect(username, command.getColor(), session);
+            case UserGameCommand.CommandType.LEAVE -> leave(username);
         }
     }
 
     private void connect(String username, String color, Session session) throws IOException {
         connections.add(username, session);
         var message = String.format("%s has joined the game as the %s player.", username, color);
+        var notification = new Notification(message);
+        connections.broadcast(username, notification);
+    }
+
+    private void leave(String username) throws IOException {
+        connections.remove(username);
+        var message = String.format("%s has left the game.", username);
         var notification = new Notification(message);
         connections.broadcast(username, notification);
     }
