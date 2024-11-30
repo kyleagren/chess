@@ -8,7 +8,6 @@ import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
-import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -17,10 +16,9 @@ import service.GameService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommandDeserializer;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.Notification;
-import websocket.messages.ServerMessage;
-import websocket.messages.ServerMessageDeserializer;
 
 import java.io.IOException;
 
@@ -43,9 +41,9 @@ public class WebSocketHandler {
             throw new DataAccessException("user not found");
         }
         switch (command.getCommandType()) {
-            case UserGameCommand.CommandType.CONNECT -> connect(username, session);
+            case UserGameCommand.CommandType.CONNECT -> connect(username, session, command.getGameID());
             case UserGameCommand.CommandType.LEAVE -> leave(username, command.getGameID());
-            case UserGameCommand.CommandType.RESIGN -> resign(username,command.getGameID());
+            case UserGameCommand.CommandType.RESIGN -> resign(username, command.getGameID());
             case UserGameCommand.CommandType.MAKE_MOVE -> {
                 MakeMoveCommand newCommand = (MakeMoveCommand) command;
                 makeMove(username, newCommand.getMove(), command.getGameID());
@@ -53,11 +51,23 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(String username, Session session) throws IOException {
+    private void connect(String username, Session session, int gameID) throws IOException, DataAccessException {
+        GameData game = gameService.getGame(gameID);
+        String message;
+        if (username.equals(game.whiteUsername())) {
+            message = String.format("%s has joined the game as the white player.", username);
+        }
+        else if (username.equals(game.blackUsername())) {
+            message = String.format("%s has joined the game as the black player.", username);
+        }
+        else {
+            message = String.format("%s has joined the game as an observer.", username);
+        }
         connections.add(username, session);
-        var message = String.format("%s has joined the game.", username);
         var notification = new Gson().toJson(new Notification(message));
-        connections.broadcast(username, notification);
+        var loadNotification = new Gson().toJson(new LoadGameMessage(game));
+        connections.send(username, loadNotification);
+        connections.sendToAll(notification);
     }
 
     private void leave(String username, int gameID) throws IOException, DataAccessException {
@@ -94,6 +104,9 @@ public class WebSocketHandler {
         }
         else {
             // observer shouldn't be able to resign
+            var message = "You can't resign as an observer.";
+            var error = new Gson().toJson(new ErrorMessage(message));
+            connections.send(username, error);
             return;
         }
 
@@ -103,17 +116,22 @@ public class WebSocketHandler {
         connections.broadcast(username, notification);
     }
 
-    private void makeMove(String username, ChessMove move, int gameID) throws DataAccessException, InvalidMoveException, IOException {
+    private void makeMove(String username, ChessMove move, int gameID)
+            throws DataAccessException, InvalidMoveException, IOException {
         GameData game = gameService.getGame(gameID);
         GameData newGame = null;
         if (username.equals(game.whiteUsername())) {
             ChessGame chessGame = game.game();
             if (chessGame.getTeamTurn() != ChessGame.TeamColor.WHITE) {
-                return;
+                connections.send(username, new Gson().toJson(new ErrorMessage("Error: It's not your turn")));
             }
             var validMoves = chessGame.validMoves(move.getStartPosition());
             if (validMoves.contains(move)) {
                 chessGame.makeMove(move);
+            }
+            else {
+                connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
+                return;
             }
             newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
         }
@@ -126,10 +144,15 @@ public class WebSocketHandler {
             if (validMoves.contains(move)) {
                 chessGame.makeMove(move);
             }
+            else {
+                connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
+                return;
+            }
             newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
         }
         else {
             // Observers shouldn't be able to make moves
+            connections.send(username, new Gson().toJson(new ErrorMessage("Error: Observers can't make moves.")));
             return;
         }
         gameService.updateGame(gameID, newGame);
@@ -139,6 +162,30 @@ public class WebSocketHandler {
         var loadNotification = new Gson().toJson(new LoadGameMessage(newGame));
         connections.sendToAll(loadNotification);
         connections.broadcast(username, notification);
+
+        if (newGame.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            message = "Black is in checkmate.";
+        }
+        else if (newGame.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            message = "White is in checkmate.";
+        }
+        else if (newGame.game().isInCheck(ChessGame.TeamColor.BLACK)) {
+            message = "Black is in check.";
+        }
+        else if (newGame.game().isInCheck(ChessGame.TeamColor.WHITE)) {
+            message = "White is in check.";
+        }
+        else if (newGame.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
+            message = "Black is in stalemate.";
+        }
+        else if (newGame.game().isInStalemate(ChessGame.TeamColor.WHITE)) {
+            message = "White is in stalemate";
+        }
+        else {
+            return;
+        }
+        notification = new Gson().toJson(new Notification(message));
+        connections.sendToAll(notification);
     }
 
     private String getUsername(String token) throws DataAccessException {

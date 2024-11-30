@@ -36,30 +36,30 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        switch (row) {
-            case 0 -> {
-                return "A" + col;
-            }
+        switch (col) {
             case 1 -> {
-                return "B" + col;
+                return "A" + row;
             }
             case 2 -> {
-                return "C" + col;
+                return "B" + row;
             }
             case 3 -> {
-                return "D" + col;
+                return "C" + row;
             }
             case 4 -> {
-                return "E" + col;
+                return "D" + row;
             }
             case 5 -> {
-                return "F" + col;
+                return "E" + row;
             }
             case 6 -> {
-                return "G" + col;
+                return "F" + row;
             }
             case 7 -> {
-                return "H" + col;
+                return "G" + row;
+            }
+            case 8 -> {
+                return "H" + row;
             }
             default -> {
                 return "";

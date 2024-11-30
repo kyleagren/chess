@@ -30,8 +30,6 @@ public class UserGameCommand {
         RESIGN
     }
 
-    public String getColor() { return color; }
-
     public CommandType getCommandType() {
         return commandType;
     }

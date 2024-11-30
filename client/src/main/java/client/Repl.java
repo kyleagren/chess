@@ -64,7 +64,6 @@ public class Repl implements ServerMessageObserver {
                     client = new InGameClient(serverUrl, this, username, gameNumber, game, client.getToken());
                     client.setToken(token);
                     client.setGame(game);
-                    client.eval("redraw");
                     needsHelp = true;
                 }
                 if (result.contains("observer")) {
@@ -76,7 +75,6 @@ public class Repl implements ServerMessageObserver {
                             gameNumber, game, client.getToken());
                     client.setToken(token);
                     client.setGame(game);
-                    client.eval("redraw");
                     needsHelp = true;
                 }
                 if (result.contains("left the game")) {
@@ -129,5 +127,6 @@ public class Repl implements ServerMessageObserver {
     private void loadGame(GameData game) {
         client.setGame(game);
         client.eval("redraw");
+        printPrompt();
     }
 }

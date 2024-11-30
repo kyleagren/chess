@@ -1,7 +1,9 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
+import chess.ChessPosition;
 import exception.ResponseException;
 import model.GameData;
 import ui.EscapeSequences;
@@ -34,6 +36,9 @@ public class InGameClient extends ChessClient {
             playerColor = "black";
             ws.joinGame(token, gameNumber);
         }
+        else {
+            ws.observeGame(token, gameNumber);
+        }
     }
 
     @Override
@@ -61,7 +66,7 @@ public class InGameClient extends ChessClient {
         return EscapeSequences.SET_TEXT_COLOR_GREEN + """
                 - help
                 - redraw
-                - move (start and end position for the preferred move) <LETTER><NUMBER> -> <LETTER><NUMBER>
+                - move (start and end position, followed by optional space and promotion piece. example: E4>E6 Queen)
                 - resign (forfeits the game, ending it)
                 - leave (leaves the game, but allows position to be filled by another player)
                 - highlight (highlights valid moves for given position) <LETTER><NUMBER>
@@ -71,12 +76,12 @@ public class InGameClient extends ChessClient {
     public String redrawBoard(String... params) {
         // Observers will be drawn from white point of view.
         if (playerColor.equals("black")) {
-            System.out.print(SET_TEXT_COLOR_BLACK);
+            System.out.print("\n" + SET_TEXT_COLOR_BLACK);
             drawBlackBoard();
             System.out.println();
         }
         else {
-            System.out.print(SET_TEXT_COLOR_BLACK);
+            System.out.print("\n" + SET_TEXT_COLOR_BLACK);
             drawWhiteBoard();
             System.out.println();
         }
@@ -186,20 +191,21 @@ public class InGameClient extends ChessClient {
                     System.out.print(SET_BG_COLOR_LIGHT_GREY);
                 }
             }
-
-            if (boardRepresentation[i][j] == null) {
-                System.out.print(EMPTY);
-                continue;
+            if (colorToDraw == ChessGame.TeamColor.WHITE) {
+                if (boardRepresentation[i][j] == null) {
+                    System.out.print(EMPTY);
+                    continue;
+                }
+                type = boardRepresentation[i][j].getPieceType();
+                color = boardRepresentation[i][j].getTeamColor();
             }
             else {
-                if (colorToDraw == ChessGame.TeamColor.WHITE) {
-                    type = boardRepresentation[i][j].getPieceType();
-                    color = boardRepresentation[i][j].getTeamColor();
+                if (boardRepresentation[i][(boardRepresentation.length - 1) - j] == null) {
+                    System.out.print(EMPTY);
+                    continue;
                 }
-                else {
-                    type = boardRepresentation[i][(boardRepresentation.length - 1) - j].getPieceType();
-                    color = boardRepresentation[i][(boardRepresentation.length - 1) - j].getTeamColor();
-                }
+                type = boardRepresentation[i][(boardRepresentation.length - 1) - j].getPieceType();
+                color = boardRepresentation[i][(boardRepresentation.length - 1) - j].getTeamColor();
             }
             if (color == ChessGame.TeamColor.WHITE) {
                 switch (type) {
@@ -225,16 +231,87 @@ public class InGameClient extends ChessClient {
     }
 
     private String leaveGame(String... params) throws ResponseException {
-        ws.leaveGame(username, gameNumber);
+        ws.leaveGame(getToken(), gameNumber);
         ws = null;
         return "Successfully left the game.";
     }
 
     private String makeMove(String... params) {
+        ChessPiece.PieceType promotionPiece = null;
+        if (params.length < 1) {
+            return "Invalid move syntax. Type the start position, an >, then the end position";
+        }
+        if (params.length > 1) {
+            String promotion = params[1].toUpperCase();
+            switch (promotion.charAt(0)) {
+                case 'Q' -> promotionPiece = ChessPiece.PieceType.QUEEN;
+                case 'K' -> promotionPiece = ChessPiece.PieceType.KNIGHT;
+                case 'B' -> promotionPiece = ChessPiece.PieceType.BISHOP;
+                case 'R' -> promotionPiece = ChessPiece.PieceType.ROOK;
+                default -> {
+                    return "Invalid promotion piece";
+                }
+            }
+        }
+        String[] positions = params[0].split(">");
+        String first = positions[0];
+        first = first.toUpperCase();
+        String second = positions[1];
+        second = second.toUpperCase();
+        int row1;
+        int col1;
+        int row2;
+        int col2;
+        if (first.length() != 2 || second.length() != 2) {
+            return "Moves should only consist of 1 letter and 1 number";
+        }
+        row1 = Character.getNumericValue(first.charAt(1));
+        if (row1 < 1 || row1 > 8) {
+            return "Invalid number";
+        }
+        switch (first.charAt(0)) {
+            case 'A' -> col1 = 1;
+            case 'B' -> col1 = 2;
+            case 'C' -> col1 = 3;
+            case 'D' -> col1 = 4;
+            case 'E' -> col1 = 5;
+            case 'F' -> col1 = 6;
+            case 'G' -> col1 = 7;
+            case 'H' -> col1 = 8;
+            default -> {
+                return "Invalid letter. It must be A-H";
+            }
+        }
+        row2 = Character.getNumericValue(second.charAt(1));
+        if (row2 < 1 || row2 > 8) {
+            return "Invalid number";
+        }
+        switch (second.charAt(0)) {
+            case 'A' -> col2 = 1;
+            case 'B' -> col2 = 2;
+            case 'C' -> col2 = 3;
+            case 'D' -> col2 = 4;
+            case 'E' -> col2 = 5;
+            case 'F' -> col2 = 6;
+            case 'G' -> col2 = 7;
+            case 'H' -> col2 = 8;
+            default -> {
+                return "Invalid letter. It must be A-H";
+            }
+        }
+        ChessPosition startPos = new ChessPosition(row1, col1);
+        ChessPosition endPos = new ChessPosition(row2, col2);
+        ChessMove newMove = new ChessMove(startPos, endPos, promotionPiece);
+        try {
+            ws.makeMove(getToken(), gameNumber, newMove);
+        } catch (ResponseException ex) {
+            return ex.getMessage();
+        }
         return "";
     }
 
-    private String resign(String... params) {
+    private String resign(String... params) throws ResponseException {
+        ws.resign(getToken(), gameNumber);
         return "";
     }
 
