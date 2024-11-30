@@ -116,6 +116,50 @@ public class GameDataAccessMySQL implements GameDataAccess {
     }
 
     @Override
+    public void updateGame(int gameID, GameData game) throws DataAccessException {
+        if (gameID == 0) {
+            throw new DataAccessException("invalid game ID");
+        }
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var newStatement = conn.prepareStatement("UPDATE game SET blackUsername=?, whiteUsername=?, " +
+                    "gameName=?, game=? WHERE id=?")) {
+                newStatement.setString(1, game.blackUsername());
+                newStatement.setString(2, game.whiteUsername());
+                newStatement.setString(3, game.gameName());
+                newStatement.setString(4, new Gson().toJson(game.game()));
+                newStatement.setInt(5, gameID);
+
+                newStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    @Override
+    public ChessGame getGameState(int gameID) throws DataAccessException {
+        ChessGame game = null;
+        if (gameID == 0) {
+            throw new DataAccessException("invalid game ID");
+        }
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String sql = "SELECT game FROM game WHERE id=?";
+            try (var preparedStatement = conn.prepareStatement(sql)) {
+                preparedStatement.setInt(1, gameID);
+
+                try (var rs = preparedStatement.executeQuery()) {
+                    while (rs.next()) {
+                        game = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+        return game;
+    }
+
+    @Override
     public ArrayList<GameData> getGames() throws DataAccessException {
         ArrayList<GameData> games = new ArrayList<>();
 

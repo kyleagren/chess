@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -10,6 +11,10 @@ public interface GameDataAccess {
     GameData getGame(int gameID) throws DataAccessException;
 
     void joinGame(int gameID, String playerColor, String username) throws DataAccessException;
+
+    void updateGame(int gameID, GameData game) throws DataAccessException;
+
+    public ChessGame getGameState(int gameID) throws DataAccessException;
 
     default boolean checkAvailability(int gameID, String playerColor) throws DataAccessException {
         GameData game;

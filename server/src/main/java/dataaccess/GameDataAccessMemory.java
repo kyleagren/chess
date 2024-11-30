@@ -57,6 +57,16 @@ public class GameDataAccessMemory implements GameDataAccess {
     }
 
     @Override
+    public void updateGame(int gameID, GameData game) {
+        // do nothing for now
+    }
+
+    @Override
+    public ChessGame getGameState(int gameID) {
+        return null;
+    }
+
+    @Override
     public ArrayList<GameData> getGames() {
         return games;
     }

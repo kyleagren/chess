@@ -23,13 +23,6 @@ public class UserGameCommand {
         this.gameID = gameID;
     }
 
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, String color) {
-        this.commandType = commandType;
-        this.authToken = authToken;
-        this.gameID = gameID;
-        this.color = color;
-    }
-
     public enum CommandType {
         CONNECT,
         MAKE_MOVE,

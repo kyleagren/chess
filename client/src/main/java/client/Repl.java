@@ -3,7 +3,6 @@ package client;
 import chess.ChessGame;
 import model.GameData;
 import ui.EscapeSequences;
-import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;

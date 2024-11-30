@@ -10,6 +10,7 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
+    private boolean isGameOver = false;
 
     private TeamColor teamTurn;
     private ChessBoard board;
@@ -17,6 +18,14 @@ public class ChessGame {
         this.board = new ChessBoard();
         this.board.resetBoard();
         teamTurn = TeamColor.WHITE;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        isGameOver = gameOver;
+    }
+
+    public boolean getGameOver() {
+        return isGameOver;
     }
 
     /**

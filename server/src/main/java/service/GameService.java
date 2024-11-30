@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.GameDataAccess;
 import dataaccess.GameDataAccessMySQL;
@@ -76,5 +77,13 @@ public class GameService {
 
     public GameData getGame(int gameID) throws DataAccessException {
         return gameDataAccess.getGame(gameID);
+    }
+
+    public void updateGame(int gameID, GameData game) throws DataAccessException {
+        gameDataAccess.updateGame(gameID, game);
+    }
+
+    public ChessGame getGameState(int gameID) throws DataAccessException {
+        return gameDataAccess.getGameState(gameID);
     }
 }

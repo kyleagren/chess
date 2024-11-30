@@ -69,7 +69,7 @@ public class InGameClient extends ChessClient {
     }
 
     public String redrawBoard(String... params) {
-        String defaultColor = "WHITE"; // Observers will be drawn from white point of view.
+        // Observers will be drawn from white point of view.
         if (playerColor.equals("black")) {
             System.out.print(SET_TEXT_COLOR_BLACK);
             drawBlackBoard();

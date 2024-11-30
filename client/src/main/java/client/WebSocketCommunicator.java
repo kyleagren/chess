@@ -48,18 +48,18 @@ public class WebSocketCommunicator extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
-    public void joinGame(String username, int gameID) throws ResponseException {
+    public void joinGame(String token, int gameID) throws ResponseException {
         try {
-            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, username, gameID);
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, token, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
     }
 
-    public void leaveGame(String username, int gameID) throws ResponseException {
+    public void leaveGame(String token, int gameID) throws ResponseException {
         try {
-            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, username, gameID);
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, token, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
