@@ -2,6 +2,7 @@ package server;
 
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
+import server.websocket.WebSocketHandler;
 import spark.*;
 
 public class Server {
@@ -20,6 +21,9 @@ public class Server {
         }
 
         // Register your endpoints and handle exceptions here
+
+        Spark.webSocket("/ws", WebSocketHandler.class);
+
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
@@ -27,7 +31,7 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
-        Spark.get("/games", this::getGame);
+        Spark.put("/games", this::getGame);
 
         Spark.awaitInitialization();
         return Spark.port();

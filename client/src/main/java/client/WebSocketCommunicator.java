@@ -2,6 +2,7 @@ package client;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
@@ -42,17 +43,19 @@ public class WebSocketCommunicator extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
-    public void joinGame(String username, String color) throws ResponseException {
+    public void joinGame(String username, int gameID) throws ResponseException {
         try {
-            this.session.getBasicRemote().sendText(username + " has joined the game as " + color);
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, username, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
     }
 
-    public void leaveGame(String username) throws ResponseException {
+    public void leaveGame(String username, int gameID) throws ResponseException {
         try {
-            this.session.getBasicRemote().sendText(username + " has left the game.");
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, username, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }

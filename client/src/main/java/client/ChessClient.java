@@ -1,10 +1,11 @@
 package client;
 
 import chess.ChessGame;
+import model.GameData;
 
 public abstract class ChessClient {
     private String token;
-    private ChessGame game;
+    private GameData game;
 
     public String getToken() {
         return token;
@@ -14,11 +15,11 @@ public abstract class ChessClient {
         token = newToken;
     }
 
-    public ChessGame getGame() {
+    public GameData getGame() {
         return game;
     }
 
-    public void setGame(ChessGame newGame) {
+    public void setGame(GameData newGame) {
         game = newGame;
     }
 

@@ -1,31 +1,38 @@
 package client;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import exception.ResponseException;
+import model.GameData;
 import ui.EscapeSequences;
-import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import static ui.EscapeSequences.*;
 
 public class InGameClient extends ChessClient {
     private ServerFacade server;
-    private String playerColor;
     private ServerMessageObserver observer;
     private WebSocketCommunicator ws;
     private String username;
+    private String playerColor;
+    private int gameNumber;
 
-    public InGameClient(String serverUrl, ServerMessageObserver observer, String username, String color, int gameNumber) throws ResponseException {
+    public InGameClient(String serverUrl, ServerMessageObserver observer, String username, int gameNumber,
+                        GameData currentGame, String token) throws ResponseException {
         server = new ServerFacade(serverUrl);
-        playerColor = color;
         this.observer = observer;
         this.ws = new WebSocketCommunicator(serverUrl, observer);
         this.username = username;
-        if (playerColor != null) {
-            ws.joinGame(username, color);
+        this.gameNumber = gameNumber;
+        if (Objects.equals(username, currentGame.whiteUsername())) {
+            playerColor = "white";
+            ws.joinGame(token, gameNumber);
+        }
+        else if (Objects.equals(username, currentGame.blackUsername())) {
+            playerColor = "black";
+            ws.joinGame(token, gameNumber);
         }
     }
 
@@ -77,7 +84,7 @@ public class InGameClient extends ChessClient {
     }
 
     private void drawWhiteBoard() {
-        ChessPiece[][] boardRepresentation = getGame().getBoard().getBoard();
+        ChessPiece[][] boardRepresentation = getGame().game().getBoard().getBoard();
 
         System.out.print(SET_BG_COLOR_YELLOW);
         System.out.print(EMPTY);
@@ -118,7 +125,7 @@ public class InGameClient extends ChessClient {
     }
 
     private void drawBlackBoard() {
-        ChessPiece[][] boardRepresentation = getGame().getBoard().getBoard();
+        ChessPiece[][] boardRepresentation = getGame().game().getBoard().getBoard();
 
         System.out.print(SET_BG_COLOR_YELLOW);
         System.out.print(EMPTY);
@@ -218,9 +225,9 @@ public class InGameClient extends ChessClient {
     }
 
     private String leaveGame(String... params) throws ResponseException {
-        ws.leaveGame(username);
+        ws.leaveGame(username, gameNumber);
         ws = null;
-        return "leave";
+        return "Successfully left the game.";
     }
 
     private String makeMove(String... params) {

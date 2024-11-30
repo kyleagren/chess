@@ -169,7 +169,6 @@ public class Handler {
     }
 
     public Object getGame(Request req, Response res) {
-        String token = req.headers("Authorization");
         res.type("application/json");
         var gameData = getBody(req, GetGameRequestBody.class);
         try {

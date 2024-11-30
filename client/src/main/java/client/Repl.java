@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessGame;
+import model.GameData;
 import ui.EscapeSequences;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -41,6 +42,9 @@ public class Repl implements ServerMessageObserver {
                 if (result.contains("logged in") || result.contains("registered")) {
                     var tokens = result.toLowerCase().split(" ");
                     username = tokens[tokens.length - 1];
+                    if (username != null && username.endsWith(".")) {
+                        username = username.substring(0, username.length() - 1);
+                    }
                     String token = client.getToken();
                     client = new PostLoginClient(serverUrl);
                     loginStatus = "LOGGED_IN";
@@ -57,15 +61,8 @@ public class Repl implements ServerMessageObserver {
                     var tokens = result.toLowerCase().split(" ");
                     int gameNumber = Integer.parseInt(tokens[1]);
                     String token = client.getToken();
-                    String currentColor = null;
-                    ChessGame game = client.getGame();
-                    if (result.contains("white")) {
-                        currentColor = "white";
-                    }
-                    else if (result.contains("black")) {
-                        currentColor = "black";
-                    }
-                    client = new InGameClient(serverUrl, this, username, currentColor, gameNumber);
+                    GameData game = client.getGame();
+                    client = new InGameClient(serverUrl, this, username, gameNumber, game, client.getToken());
                     client.setToken(token);
                     client.setGame(game);
                     client.eval("redraw");
@@ -75,14 +72,15 @@ public class Repl implements ServerMessageObserver {
                     var tokens = result.toLowerCase().split(" ");
                     int gameNumber = Integer.parseInt(tokens[1]);
                     String token = client.getToken();
-                    ChessGame game = client.getGame();
-                    client = new InGameClient(serverUrl, this, null,null, gameNumber);
+                    GameData game = client.getGame();
+                    client = new InGameClient(serverUrl, this, null,
+                            gameNumber, game, client.getToken());
                     client.setToken(token);
                     client.setGame(game);
                     client.eval("redraw");
                     needsHelp = true;
                 }
-                if (result.contains("leave")) {
+                if (result.contains("left the game")) {
                     String token = client.getToken();
                     client = new PostLoginClient(serverUrl);
                     client.setToken(token);
@@ -129,7 +127,7 @@ public class Repl implements ServerMessageObserver {
         printPrompt();
     }
 
-    private void loadGame(ChessGame game) {
+    private void loadGame(GameData game) {
         client.setGame(game);
         client.eval("redraw");
     }

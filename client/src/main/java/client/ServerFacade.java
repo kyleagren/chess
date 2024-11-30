@@ -5,10 +5,7 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import response.EmptySuccessResponse;
-import response.GameCreatedResponse;
-import response.GamesListResponse;
-import response.JoinGameRequestBody;
+import response.*;
 
 public class ServerFacade {
     private final String serverUrl;
@@ -54,9 +51,8 @@ public class ServerFacade {
         return communicator.makeRequest("DELETE", path, null, EmptySuccessResponse.class, "");
     }
 
-    public GameData getGame(int gameID) throws ResponseException {
+    public GameData getGame(GetGameRequestBody data, String token) throws ResponseException {
         var path = "/games";
-        return communicator.makeRequest("GET", path, null, GameData.class, "");
-
+        return communicator.makeRequest("PUT", path, data, GameData.class, token);
     }
 }
