@@ -1,6 +1,5 @@
 package client;
 
-import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -10,10 +9,11 @@ import exception.ResponseException;
 import model.GameData;
 import ui.EscapeSequences;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
@@ -70,7 +70,7 @@ public class InGameClient extends ChessClient {
         return EscapeSequences.SET_TEXT_COLOR_GREEN + """
                 - help
                 - redraw
-                - move (start and end position, followed by optional space and promotion piece. example: E4>E6 Queen)
+                - move (start and end position, followed by promotion piece. example: E4 E6 Queen)
                 - resign (forfeits the game, ending it)
                 - leave (leaves the game, but allows position to be filled by another player)
                 - highlight (highlights valid moves for given position) <LETTER><NUMBER>
@@ -103,63 +103,12 @@ public class InGameClient extends ChessClient {
 
     private String makeMove(String... params) {
         ChessMove newMove;
-        try {
-            newMove = new Gson().fromJson(parseTileInput(params), ChessMove.class);
-        } catch (JsonSyntaxException ex) {
-            return ex.getMessage();
-        }
-        try {
-            ws.makeMove(getToken(), gameNumber, newMove);
-        } catch (ResponseException ex) {
-            return ex.getMessage();
-        }
-        return "";
-    }
-
-    private String resign(String... params) throws ResponseException {
-        ws.resign(getToken(), gameNumber);
-        return "";
-    }
-
-    private String highlightPossibleMoves(String... params) {
-        if (params.length != 1) {
-            return "Invalid input. Please input a start tile";
-        }
-        BoardDrawer drawer = new BoardDrawer(getGame());
-        int col1;
-        int row1;
-        String upperWord = params[0].toUpperCase();
-        switch (upperWord.charAt(0)) {
-            case 'A' -> col1 = 1;
-            case 'B' -> col1 = 2;
-            case 'C' -> col1 = 3;
-            case 'D' -> col1 = 4;
-            case 'E' -> col1 = 5;
-            case 'F' -> col1 = 6;
-            case 'G' -> col1 = 7;
-            case 'H' -> col1 = 8;
-            default -> {
-                return "Invalid letter. It must be A-H";
-            }
-        }
-        row1 = Character.getNumericValue(upperWord.charAt(1));
-        if (row1 < 1 || row1 > 8) {
-            return "Invalid number";
-        }
-        ChessPosition startPos = new ChessPosition(row1, col1);
-
-        Collection<ChessMove> validMoves = getGame().game().validMoves(startPos);
-
-        return drawer.drawHighlighted(validMoves, playerColor);
-    }
-
-    private String parseTileInput(String... params) {
         ChessPiece.PieceType promotionPiece = null;
 
-        if (params.length < 1) {
-            return "Invalid move syntax. Type the start position, an >, then the end position";
+        if (params.length < 2) {
+            return "Invalid move syntax. Type the start position, a space, then the end position";
         }
-        if (params.length > 1) {
+        if (params.length > 2) {
             String promotion = params[1].toUpperCase();
             switch (promotion.charAt(0)) {
                 case 'Q' -> promotionPiece = ChessPiece.PieceType.QUEEN;
@@ -167,14 +116,13 @@ public class InGameClient extends ChessClient {
                 case 'B' -> promotionPiece = ChessPiece.PieceType.BISHOP;
                 case 'R' -> promotionPiece = ChessPiece.PieceType.ROOK;
                 default -> {
-                    return "Invalid promotion piece";
+                    return "Invalid promotion piece <startPos> <endPos> <promotionPiece>";
                 }
             }
         }
-        String[] positions = params[0].split(">");
-        String first = positions[0];
+        String first = params[0];
         first = first.toUpperCase();
-        String second = positions[1];
+        String second = params[1];
         second = second.toUpperCase();
         int row1;
         int col1;
@@ -219,8 +167,59 @@ public class InGameClient extends ChessClient {
         }
         ChessPosition startPos = new ChessPosition(row1, col1);
         ChessPosition endPos = new ChessPosition(row2, col2);
-        ChessMove newMove = new ChessMove(startPos, endPos, promotionPiece);
+        newMove = new ChessMove(startPos, endPos, promotionPiece);
+        try {
+            ws.makeMove(getToken(), gameNumber, newMove);
+        } catch (ResponseException ex) {
+            return ex.getMessage();
+        }
+        return "";
+    }
 
-        return new Gson().toJson(newMove, ChessMove.class);
+    private String resign(String... params) throws ResponseException {
+        Scanner scanner = new Scanner(System.in); // Create a Scanner for user input
+        System.out.println("Are you sure you want to resign? Type 'yes' to confirm:");
+
+        String input = scanner.nextLine().trim();
+        input = input.toLowerCase();
+        if (input.equals("yes")) {
+            ws.resign(getToken(), gameNumber);
+        }
+        else {
+            return "Resignation cancelled.";
+        }
+        return "";
+    }
+
+    private String highlightPossibleMoves(String... params) {
+        if (params.length != 1) {
+            return "Invalid input. Please input a start tile";
+        }
+        BoardDrawer drawer = new BoardDrawer(getGame());
+        int col1;
+        int row1;
+        String upperWord = params[0].toUpperCase();
+        switch (upperWord.charAt(0)) {
+            case 'A' -> col1 = 1;
+            case 'B' -> col1 = 2;
+            case 'C' -> col1 = 3;
+            case 'D' -> col1 = 4;
+            case 'E' -> col1 = 5;
+            case 'F' -> col1 = 6;
+            case 'G' -> col1 = 7;
+            case 'H' -> col1 = 8;
+            default -> {
+                return "Invalid letter. It must be A-H";
+            }
+        }
+        row1 = Character.getNumericValue(upperWord.charAt(1));
+        if (row1 < 1 || row1 > 8) {
+            return "Invalid number";
+        }
+        ChessPosition startPos = new ChessPosition(row1, col1);
+
+        Collection<ChessMove> validMoves = getGame().game().validMoves(startPos);
+
+        return drawer.drawHighlighted(validMoves, playerColor);
     }
 }

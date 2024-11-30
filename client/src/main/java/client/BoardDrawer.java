@@ -208,10 +208,10 @@ public class BoardDrawer {
     }
 
     public String drawHighlighted(Collection<ChessMove> validMoves, String color) {
-        System.out.print(SET_TEXT_COLOR_BLACK);
-        if (validMoves.isEmpty()) {
+        if (validMoves == null || validMoves.isEmpty()) {
             return "No valid moves to highlight.";
         }
+        System.out.print(SET_TEXT_COLOR_BLACK);
         if (color.equals("black")) {
             drawBlackBoard(validMoves);
         }

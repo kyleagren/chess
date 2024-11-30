@@ -177,8 +177,11 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-
-        return isInCheck(teamColor) && isInStalemateIgnoresCheck(teamColor);
+        boolean result = isInCheck(teamColor) && isInStalemateIgnoresCheck(teamColor);
+        if (result == true) {
+            setGameOver(true);
+        }
+        return result;
     }
 
     /**
@@ -225,6 +228,9 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInStalemateIgnoresCheck(teamColor))
         {
+            if (!isInCheck(teamColor)) {
+                setGameOver(true);
+            }
             return !isInCheck(teamColor);
         }
         return false;

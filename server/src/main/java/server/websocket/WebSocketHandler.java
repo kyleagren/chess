@@ -20,6 +20,7 @@ import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.Notification;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 
 @WebSocket
@@ -38,7 +39,7 @@ public class WebSocketHandler {
 
         String username = getUsername(command.getAuthToken());
         if (username == null) {
-            throw new DataAccessException("user not found");
+            return;
         }
         switch (command.getCommandType()) {
             case UserGameCommand.CommandType.CONNECT -> connect(username, session, command.getGameID());
@@ -52,7 +53,13 @@ public class WebSocketHandler {
     }
 
     private void connect(String username, Session session, int gameID) throws IOException, DataAccessException {
-        GameData game = gameService.getGame(gameID);
+        GameData game;
+        try {
+            game = gameService.getGame(gameID);
+        } catch (DataAccessException ex) {
+            connections.send(username, new Gson().toJson(new ErrorMessage("Invalid game number")));
+            return;
+        }
         String message;
         if (username.equals(game.whiteUsername())) {
             message = String.format("%s has joined the game as the white player.", username);
@@ -77,7 +84,7 @@ public class WebSocketHandler {
             newGame = new GameData(gameID, null, game.blackUsername(), game.gameName(), game.game());
         }
         if (username.equals(game.blackUsername())) {
-            newGame = new GameData(gameID, null, game.blackUsername(), game.gameName(), game.game());
+            newGame = new GameData(gameID, game.whiteUsername(), null, game.gameName(), game.game());
         }
         if (newGame != null) {
             // leaves the game in the database if the user isn't an observer
@@ -113,7 +120,7 @@ public class WebSocketHandler {
         gameService.updateGame(gameID, newGame);
         var message = String.format("%s has resigned the game.", username);
         var notification = new Gson().toJson(new Notification(message));
-        connections.broadcast(username, notification);
+        connections.sendToAll(notification);
     }
 
     private void makeMove(String username, ChessMove move, int gameID)
@@ -124,10 +131,20 @@ public class WebSocketHandler {
             ChessGame chessGame = game.game();
             if (chessGame.getTeamTurn() != ChessGame.TeamColor.WHITE) {
                 connections.send(username, new Gson().toJson(new ErrorMessage("Error: It's not your turn")));
+                return;
             }
             var validMoves = chessGame.validMoves(move.getStartPosition());
-            if (validMoves.contains(move)) {
-                chessGame.makeMove(move);
+            if (validMoves == null) {
+                connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
+                return;
+            }
+            else if (validMoves.contains(move)) {
+                try {
+                    chessGame.makeMove(move);
+                } catch (InvalidMoveException ex) {
+                    connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
+                    return;
+                }
             }
             else {
                 connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
@@ -138,11 +155,21 @@ public class WebSocketHandler {
         else if (username.equals(game.blackUsername())) {
             ChessGame chessGame = game.game();
             if (chessGame.getTeamTurn() != ChessGame.TeamColor.BLACK) {
+                connections.send(username, new Gson().toJson(new ErrorMessage("Error: It's not your turn")));
                 return;
             }
             var validMoves = chessGame.validMoves(move.getStartPosition());
-            if (validMoves.contains(move)) {
-                chessGame.makeMove(move);
+            if (validMoves == null) {
+                connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
+                return;
+            }
+            else if (validMoves.contains(move)) {
+                try {
+                    chessGame.makeMove(move);
+                } catch (InvalidMoveException ex) {
+                    connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
+                    return;
+                }
             }
             else {
                 connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
@@ -163,23 +190,25 @@ public class WebSocketHandler {
         connections.sendToAll(loadNotification);
         connections.broadcast(username, notification);
 
+        String blackUser = newGame.blackUsername();
+        String whiteUser = newGame.whiteUsername();
         if (newGame.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            message = "Black is in checkmate.";
+            message = String.format("%s (black) is in checkmate.", blackUser);
         }
         else if (newGame.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            message = "White is in checkmate.";
+            message = String.format("%s (white) is in checkmate.", whiteUser);
         }
         else if (newGame.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
-            message = "Black is in stalemate.";
+            message = String.format("%s (black) is in stalemate.", blackUser);
         }
         else if (newGame.game().isInStalemate(ChessGame.TeamColor.WHITE)) {
-            message = "White is in stalemate";
+            message = String.format("%s (white) is in stalemate.", whiteUser);
         }
         else if (newGame.game().isInCheck(ChessGame.TeamColor.BLACK)) {
-            message = "Black is in check.";
+            message = String.format("%s (black) is in check.", blackUser);
         }
         else if (newGame.game().isInCheck(ChessGame.TeamColor.WHITE)) {
-            message = "White is in check.";
+            message = String.format("%s (white) is in check.", whiteUser);
         }
         else {
             return;

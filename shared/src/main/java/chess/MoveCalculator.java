@@ -348,16 +348,26 @@ public class MoveCalculator {
             }
         }
         // Move diagonal one if a piece can be captured
-        if (currentRow < 7 && currentCol > 1 && currentCol < 8 && color == ChessGame.TeamColor.WHITE) {
-            ChessPosition newPosition1 = new ChessPosition(currentRow + 1, currentCol - 1);
-            ChessPosition newPosition2 = new ChessPosition(currentRow + 1, currentCol + 1);
-            if (board.getPiece(newPosition1) != null && board.getPiece(newPosition1).getTeamColor() != color) {
-                ChessMove possibleMove = new ChessMove(myPosition, newPosition1, null);
-                possibleMoves.add(possibleMove);
+        if (currentRow < 7 && color == ChessGame.TeamColor.WHITE) {
+            ChessPosition newPosition1 = null;
+            ChessPosition newPosition2 = null;
+            if (currentCol > 1) {
+                newPosition1 = new ChessPosition(currentRow + 1, currentCol - 1);
             }
-            if (board.getPiece(newPosition2) != null && board.getPiece(newPosition2).getTeamColor() != color) {
-                ChessMove possibleMove = new ChessMove(myPosition, newPosition2, null);
-                possibleMoves.add(possibleMove);
+            if (currentCol < 8) {
+                newPosition2 = new ChessPosition(currentRow + 1, currentCol + 1);
+            }
+            if (newPosition1 != null) {
+                if (board.getPiece(newPosition1) != null && board.getPiece(newPosition1).getTeamColor() != color) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition1, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            if (newPosition2 != null) {
+                if (board.getPiece(newPosition2) != null && board.getPiece(newPosition2).getTeamColor() != color) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition2, null);
+                    possibleMoves.add(possibleMove);
+                }
             }
         }
         if (currentRow == 7 && currentCol > 1 && currentCol < 8 && color == ChessGame.TeamColor.WHITE) {
@@ -408,16 +418,26 @@ public class MoveCalculator {
             }
         }
         // Move diagonal one if a piece can be captured
-        if (currentRow > 2 && currentCol > 1 && currentCol < 8 && color == ChessGame.TeamColor.BLACK) {
-            ChessPosition newPosition1 = new ChessPosition(currentRow - 1, currentCol - 1);
-            ChessPosition newPosition2 = new ChessPosition(currentRow - 1, currentCol + 1);
-            if (board.getPiece(newPosition1) != null && board.getPiece(newPosition1).getTeamColor() != color) {
-                ChessMove possibleMove = new ChessMove(myPosition, newPosition1, null);
-                possibleMoves.add(possibleMove);
+        if (currentRow > 2 && color == ChessGame.TeamColor.BLACK) {
+            ChessPosition newPosition1 = null;
+            ChessPosition newPosition2 = null;
+            if (currentCol > 1) {
+                newPosition1 = new ChessPosition(currentRow - 1, currentCol - 1);
             }
-            if (board.getPiece(newPosition2) != null && board.getPiece(newPosition2).getTeamColor() != color) {
-                ChessMove possibleMove = new ChessMove(myPosition, newPosition2, null);
-                possibleMoves.add(possibleMove);
+            if (currentCol < 8) {
+                newPosition2 = new ChessPosition(currentRow - 1, currentCol + 1);
+            }
+            if (newPosition1 != null) {
+                if (board.getPiece(newPosition1) != null && board.getPiece(newPosition1).getTeamColor() != color) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition1, null);
+                    possibleMoves.add(possibleMove);
+                }
+            }
+            if (newPosition2 != null) {
+                if (board.getPiece(newPosition2) != null && board.getPiece(newPosition2).getTeamColor() != color) {
+                    ChessMove possibleMove = new ChessMove(myPosition, newPosition2, null);
+                    possibleMoves.add(possibleMove);
+                }
             }
         }
         if (currentRow == 2 && currentCol > 1 && currentCol < 8 && color == ChessGame.TeamColor.BLACK) {
