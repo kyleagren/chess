@@ -122,19 +122,35 @@ public class InGameClient extends ChessClient {
     }
 
     private String highlightPossibleMoves(String... params) {
-        BoardDrawer drawer = new BoardDrawer(getGame());
-        GameData game = getGame();
-        ChessGame chessGame = game.game();
-        ChessMove newMove;
-        try {
-            newMove = new Gson().fromJson(parseTileInput(params), ChessMove.class);
-        } catch (JsonSyntaxException ex) {
-            return ex.getMessage();
+        if (params.length != 1) {
+            return "Invalid input. Please input a start tile";
         }
-        Collection<ChessMove> validMoves = chessGame.validMoves(newMove.getStartPosition());
+        BoardDrawer drawer = new BoardDrawer(getGame());
+        int col1;
+        int row1;
+        String upperWord = params[0].toUpperCase();
+        switch (upperWord.charAt(0)) {
+            case 'A' -> col1 = 1;
+            case 'B' -> col1 = 2;
+            case 'C' -> col1 = 3;
+            case 'D' -> col1 = 4;
+            case 'E' -> col1 = 5;
+            case 'F' -> col1 = 6;
+            case 'G' -> col1 = 7;
+            case 'H' -> col1 = 8;
+            default -> {
+                return "Invalid letter. It must be A-H";
+            }
+        }
+        row1 = Character.getNumericValue(upperWord.charAt(1));
+        if (row1 < 1 || row1 > 8) {
+            return "Invalid number";
+        }
+        ChessPosition startPos = new ChessPosition(row1, col1);
 
-        drawer.drawHighlighted(validMoves);
-        return "";
+        Collection<ChessMove> validMoves = getGame().game().validMoves(startPos);
+
+        return drawer.drawHighlighted(validMoves, playerColor);
     }
 
     private String parseTileInput(String... params) {

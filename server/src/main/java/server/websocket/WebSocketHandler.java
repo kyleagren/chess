@@ -67,7 +67,7 @@ public class WebSocketHandler {
         var notification = new Gson().toJson(new Notification(message));
         var loadNotification = new Gson().toJson(new LoadGameMessage(game));
         connections.send(username, loadNotification);
-        connections.sendToAll(notification);
+        connections.broadcast(username, notification);
     }
 
     private void leave(String username, int gameID) throws IOException, DataAccessException {

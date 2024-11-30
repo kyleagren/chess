@@ -3,8 +3,10 @@ package client;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
+import chess.ChessPosition;
 import model.GameData;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static ui.EscapeSequences.*;
@@ -98,28 +100,72 @@ public class BoardDrawer {
         System.out.println(SET_BG_COLOR_BLACK);
     }
 
-    public void drawBoard(ChessPiece[][] boardRepresentation, int i, ChessGame.TeamColor colorToDraw, Collection<ChessMove> validMoves) {
+    public void drawBoard(ChessPiece[][] boardRepresentation, int i,
+                          ChessGame.TeamColor colorToDraw, Collection<ChessMove> validMoves) {
         ChessPiece.PieceType type;
         ChessGame.TeamColor color;
+        ChessPosition start = null;
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int startCol = -1;
+        int startRow = -1;
+        ArrayList<Integer> rowPositions = new ArrayList<>();
+        ArrayList<Integer> colPositions = new ArrayList<>();
         if (validMoves != null) {
-            // TODO - set this up to highlight squares based on valid moves.
+            moves = (ArrayList<ChessMove>) validMoves;
+            start = moves.getFirst().getStartPosition();
+
+            startCol = start.getColumn() - 1;
+            startRow = start.getRow() - 1;
         }
+
 
         for (int j = 0; j < boardRepresentation.length; j++) {
             if (colorToDraw == ChessGame.TeamColor.WHITE) {
-                if ((i + j) % 2 != 0) {
-                    System.out.print(SET_BG_COLOR_WHITE);
+                if (i == startRow && j == startCol) {
+                    System.out.print(SET_BG_COLOR_MAGENTA);
+                }
+                else if ((i + j) % 2 != 0) {
+                    if (start != null && moves.contains(
+                            new ChessMove(start, new ChessPosition(i + 1, j + 1), null))) {
+                        System.out.print(SET_BG_COLOR_GREEN);
+                    }
+                    else {
+                        System.out.print(SET_BG_COLOR_WHITE);
+                    }
                 }
                 else {
-                    System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                    if (start != null && moves.contains(
+                            new ChessMove(start, new ChessPosition(i + 1, j + 1), null))) {
+                        System.out.print(SET_BG_COLOR_DARK_GREEN);
+                    }
+                    else {
+                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                    }
                 }
             }
             else {
-                if ((i + j) % 2 == 0) {
-                    System.out.print(SET_BG_COLOR_WHITE);
+                if (i == startRow && (boardRepresentation.length - j) - 1 == startCol) {
+                    System.out.print(SET_BG_COLOR_MAGENTA);
+                }
+                else if ((i + j) % 2 == 0) {
+                    if (start != null && moves.contains(
+                            new ChessMove(start, new ChessPosition(i + 1,
+                                    boardRepresentation.length - j), null))) {
+                        System.out.print(SET_BG_COLOR_GREEN);
+                    }
+                    else {
+                        System.out.print(SET_BG_COLOR_WHITE);
+                    }
                 }
                 else {
-                    System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                    if (start != null && moves.contains(
+                            new ChessMove(start, new ChessPosition(i + 1,
+                                    boardRepresentation.length - j), null))) {
+                        System.out.print(SET_BG_COLOR_DARK_GREEN);
+                    }
+                    else {
+                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                    }
                 }
             }
             if (colorToDraw == ChessGame.TeamColor.WHITE) {
@@ -161,7 +207,17 @@ public class BoardDrawer {
         }
     }
 
-    public void drawHighlighted(Collection<ChessMove> validMoves) {
-
+    public String drawHighlighted(Collection<ChessMove> validMoves, String color) {
+        System.out.print(SET_TEXT_COLOR_BLACK);
+        if (validMoves.isEmpty()) {
+            return "No valid moves to highlight.";
+        }
+        if (color.equals("black")) {
+            drawBlackBoard(validMoves);
+        }
+        else {
+            drawWhiteBoard(validMoves);
+        }
+        return "";
     }
 }
