@@ -33,4 +33,18 @@ public class ConnectionManager {
             connections.remove(c.username);
         }
     }
+
+    public void sendToAll(String message) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c : connections.values()) {
+            if (c.session.isOpen()) {
+                c.send(message);
+            } else {
+                removeList.add(c);
+            }
+        }
+        for (var c : removeList) {
+            connections.remove(c.username);
+        }
+    }
 }

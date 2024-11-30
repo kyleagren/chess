@@ -2,6 +2,7 @@ package server.websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
@@ -16,6 +17,7 @@ import service.GameService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommandDeserializer;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 import websocket.messages.ServerMessageDeserializer;
@@ -29,7 +31,8 @@ public class WebSocketHandler {
     private final GameService gameService = new GameService();
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException, DataAccessException {
+    public void onMessage(Session session, String message) throws IOException,
+            DataAccessException, InvalidMoveException {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(UserGameCommand.class, new UserGameCommandDeserializer())
                 .create();
@@ -45,7 +48,7 @@ public class WebSocketHandler {
             case UserGameCommand.CommandType.RESIGN -> resign(username,command.getGameID());
             case UserGameCommand.CommandType.MAKE_MOVE -> {
                 MakeMoveCommand newCommand = (MakeMoveCommand) command;
-                makeMove(newCommand.getMove());
+                makeMove(username, newCommand.getMove(), command.getGameID());
             }
         }
     }
@@ -90,18 +93,52 @@ public class WebSocketHandler {
             newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
         }
         else {
+            // observer shouldn't be able to resign
             return;
         }
 
         gameService.updateGame(gameID, newGame);
-        connections.remove(username);
-        var message = String.format("%s has left the game.", username);
+        var message = String.format("%s has resigned the game.", username);
         var notification = new Gson().toJson(new Notification(message));
         connections.broadcast(username, notification);
     }
 
-    private void makeMove(ChessMove move) {
-
+    private void makeMove(String username, ChessMove move, int gameID) throws DataAccessException, InvalidMoveException, IOException {
+        GameData game = gameService.getGame(gameID);
+        GameData newGame = null;
+        if (username.equals(game.whiteUsername())) {
+            ChessGame chessGame = game.game();
+            if (chessGame.getTeamTurn() != ChessGame.TeamColor.WHITE) {
+                return;
+            }
+            var validMoves = chessGame.validMoves(move.getStartPosition());
+            if (validMoves.contains(move)) {
+                chessGame.makeMove(move);
+            }
+            newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+        }
+        else if (username.equals(game.blackUsername())) {
+            ChessGame chessGame = game.game();
+            if (chessGame.getTeamTurn() != ChessGame.TeamColor.BLACK) {
+                return;
+            }
+            var validMoves = chessGame.validMoves(move.getStartPosition());
+            if (validMoves.contains(move)) {
+                chessGame.makeMove(move);
+            }
+            newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+        }
+        else {
+            // Observers shouldn't be able to make moves
+            return;
+        }
+        gameService.updateGame(gameID, newGame);
+        var message = String.format("%s has moved from %s to %s.", username,
+                move.getStartPosition(), move.getEndPosition());
+        var notification = new Gson().toJson(new Notification(message));
+        var loadNotification = new Gson().toJson(new LoadGameMessage(newGame));
+        connections.sendToAll(loadNotification);
+        connections.broadcast(username, notification);
     }
 
     private String getUsername(String token) throws DataAccessException {
