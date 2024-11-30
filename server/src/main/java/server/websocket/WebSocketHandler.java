@@ -169,17 +169,17 @@ public class WebSocketHandler {
         else if (newGame.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
             message = "White is in checkmate.";
         }
-        else if (newGame.game().isInCheck(ChessGame.TeamColor.BLACK)) {
-            message = "Black is in check.";
-        }
-        else if (newGame.game().isInCheck(ChessGame.TeamColor.WHITE)) {
-            message = "White is in check.";
-        }
         else if (newGame.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
             message = "Black is in stalemate.";
         }
         else if (newGame.game().isInStalemate(ChessGame.TeamColor.WHITE)) {
             message = "White is in stalemate";
+        }
+        else if (newGame.game().isInCheck(ChessGame.TeamColor.BLACK)) {
+            message = "Black is in check.";
+        }
+        else if (newGame.game().isInCheck(ChessGame.TeamColor.WHITE)) {
+            message = "White is in check.";
         }
         else {
             return;
