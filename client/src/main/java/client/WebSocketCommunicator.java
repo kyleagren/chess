@@ -1,10 +1,12 @@
 package client;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import exception.ResponseException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
+import websocket.messages.ServerMessageDeserializer;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -27,8 +29,11 @@ public class WebSocketCommunicator extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String incomingMessage) {
+                    Gson gson = new GsonBuilder()
+                            .registerTypeAdapter(ServerMessage.class, new ServerMessageDeserializer())
+                            .create();
                     try {
-                        ServerMessage message = new Gson().fromJson(incomingMessage, ServerMessage.class);
+                        var message = gson.fromJson(incomingMessage, ServerMessage.class);
                         observer.notify(message);
                     } catch(Exception ex) {
                         observer.notify(new ErrorMessage(ex.getMessage()));

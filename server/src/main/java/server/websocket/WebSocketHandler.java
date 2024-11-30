@@ -31,14 +31,14 @@ public class WebSocketHandler {
     private void connect(String username, Session session) throws IOException {
         connections.add(username, session);
         var message = String.format("%s has joined the game.", username);
-        var notification = new Notification(message);
+        var notification = new Gson().toJson(new Notification(message));
         connections.broadcast(username, notification);
     }
 
     private void leave(String username) throws IOException {
         connections.remove(username);
         var message = String.format("%s has left the game.", username);
-        var notification = new Notification(message);
+        var notification = new Gson().toJson(new Notification(message));
         connections.broadcast(username, notification);
     }
 
