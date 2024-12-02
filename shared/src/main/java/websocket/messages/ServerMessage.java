@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
-    private String messageText;
+    private String message;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -27,11 +27,11 @@ public class ServerMessage {
     }
 
     public void setMessageText(String text) {
-        messageText = text;
+        message = text;
     }
 
     public String getMessageText() {
-        return messageText;
+        return message;
     }
 
     @Override

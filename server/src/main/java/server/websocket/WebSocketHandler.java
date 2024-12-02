@@ -31,7 +31,7 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException,
-            DataAccessException, InvalidMoveException {
+            DataAccessException {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(UserGameCommand.class, new UserGameCommandDeserializer())
                 .create();
@@ -39,6 +39,7 @@ public class WebSocketHandler {
 
         String username = getUsername(command.getAuthToken());
         if (username == null) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid auth token.")));
             return;
         }
         switch (command.getCommandType()) {
@@ -52,11 +53,12 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(String username, Session session, int gameID) throws IOException, DataAccessException {
+    private void connect(String username, Session session, int gameID) throws IOException {
         GameData game;
         try {
             game = gameService.getGame(gameID);
         } catch (DataAccessException ex) {
+            connections.add(username, session, gameID);
             connections.send(username, new Gson().toJson(new ErrorMessage("Invalid game number")));
             return;
         }
@@ -70,7 +72,7 @@ public class WebSocketHandler {
         else {
             message = String.format("%s has joined the game as an observer.", username);
         }
-        connections.add(username, session);
+        connections.add(username, session, gameID);
         var notification = new Gson().toJson(new Notification(message));
         var loadNotification = new Gson().toJson(new LoadGameMessage(game));
         connections.send(username, loadNotification);
@@ -90,15 +92,19 @@ public class WebSocketHandler {
             // leaves the game in the database if the user isn't an observer
             gameService.updateGame(gameID, newGame);
         }
-        connections.remove(username);
         var message = String.format("%s has left the game.", username);
         var notification = new Gson().toJson(new Notification(message));
         connections.broadcast(username, notification);
+        connections.remove(username);
     }
 
     private void resign(String username, int gameID) throws IOException, DataAccessException {
         GameData game = gameService.getGame(gameID);
         GameData newGame = null;
+        if (game.game().getGameOver()) {
+            connections.send(username, new Gson().toJson(new ErrorMessage("Error: The game is already over.")));
+            return;
+        }
         if (username.equals(game.whiteUsername())) {
             ChessGame chessGame = game.game();
             chessGame.setGameOver(true);
@@ -120,13 +126,17 @@ public class WebSocketHandler {
         gameService.updateGame(gameID, newGame);
         var message = String.format("%s has resigned the game.", username);
         var notification = new Gson().toJson(new Notification(message));
-        connections.sendToAll(notification);
+        connections.sendToAll(username, notification);
     }
 
     private void makeMove(String username, ChessMove move, int gameID)
-            throws DataAccessException, InvalidMoveException, IOException {
+            throws DataAccessException, IOException {
         GameData game = gameService.getGame(gameID);
         GameData newGame = null;
+        if (game.game().getGameOver()) {
+            connections.send(username, new Gson().toJson(new ErrorMessage("Error: The game is over.")));
+            return;
+        }
         if (username.equals(game.whiteUsername())) {
             ChessGame chessGame = game.game();
             if (chessGame.getTeamTurn() != ChessGame.TeamColor.WHITE) {
@@ -187,7 +197,7 @@ public class WebSocketHandler {
                 move.getStartPosition(), move.getEndPosition());
         var notification = new Gson().toJson(new Notification(message));
         var loadNotification = new Gson().toJson(new LoadGameMessage(newGame));
-        connections.sendToAll(loadNotification);
+        connections.sendToAll(username, loadNotification);
         connections.broadcast(username, notification);
 
         String blackUser = newGame.blackUsername();
@@ -214,7 +224,7 @@ public class WebSocketHandler {
             return;
         }
         notification = new Gson().toJson(new Notification(message));
-        connections.sendToAll(notification);
+        connections.sendToAll(username, notification);
     }
 
     private String getUsername(String token) throws DataAccessException {
