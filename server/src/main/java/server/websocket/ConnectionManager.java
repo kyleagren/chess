@@ -4,6 +4,7 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +32,11 @@ public class ConnectionManager {
                 .map(Map.Entry::getKey)
                 .toList();
 
+        notify(message, usersInCurrentGame, removeList);
+    }
+
+    private void notify(String message, List<String> usersInCurrentGame,
+                        ArrayList<Connection> removeList) throws IOException {
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (usersInCurrentGame.contains(c.username)) {
@@ -53,18 +59,7 @@ public class ConnectionManager {
                 .map(Map.Entry::getKey)
                 .toList();
 
-        for (var c : connections.values()) {
-            if (c.session.isOpen()) {
-                if (usersInCurrentGame.contains(c.username)) {
-                    c.send(message);
-                }
-            } else {
-                removeList.add(c);
-            }
-        }
-        for (var c : removeList) {
-            connections.remove(c.username);
-        }
+        notify(message, usersInCurrentGame, removeList);
     }
 
     public void send(String includeUsername, String message) throws IOException {

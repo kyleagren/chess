@@ -108,8 +108,6 @@ public class BoardDrawer {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int startCol = -1;
         int startRow = -1;
-        ArrayList<Integer> rowPositions = new ArrayList<>();
-        ArrayList<Integer> colPositions = new ArrayList<>();
         if (validMoves != null) {
             moves = (ArrayList<ChessMove>) validMoves;
             start = moves.getFirst().getStartPosition();
@@ -117,8 +115,6 @@ public class BoardDrawer {
             startCol = start.getColumn() - 1;
             startRow = start.getRow() - 1;
         }
-
-
         for (int j = 0; j < boardRepresentation.length; j++) {
             if (colorToDraw == ChessGame.TeamColor.WHITE) {
                 if (i == startRow && j == startCol) {
@@ -184,25 +180,29 @@ public class BoardDrawer {
                 type = boardRepresentation[i][(boardRepresentation.length - 1) - j].getPieceType();
                 color = boardRepresentation[i][(boardRepresentation.length - 1) - j].getTeamColor();
             }
-            if (color == ChessGame.TeamColor.WHITE) {
-                switch (type) {
-                    case ChessPiece.PieceType.QUEEN -> System.out.print(WHITE_QUEEN);
-                    case ChessPiece.PieceType.KING  -> System.out.print(WHITE_KING);
-                    case ChessPiece.PieceType.BISHOP  -> System.out.print(WHITE_BISHOP);
-                    case ChessPiece.PieceType.KNIGHT  -> System.out.print(WHITE_KNIGHT);
-                    case ChessPiece.PieceType.ROOK  -> System.out.print(WHITE_ROOK);
-                    case ChessPiece.PieceType.PAWN  -> System.out.print(WHITE_PAWN);
-                }
+            displayPieces(color, type);
+        }
+    }
+
+    private void displayPieces(ChessGame.TeamColor color, ChessPiece.PieceType type) {
+        if (color == ChessGame.TeamColor.WHITE) {
+            switch (type) {
+                case ChessPiece.PieceType.QUEEN -> System.out.print(WHITE_QUEEN);
+                case ChessPiece.PieceType.KING  -> System.out.print(WHITE_KING);
+                case ChessPiece.PieceType.BISHOP  -> System.out.print(WHITE_BISHOP);
+                case ChessPiece.PieceType.KNIGHT  -> System.out.print(WHITE_KNIGHT);
+                case ChessPiece.PieceType.ROOK  -> System.out.print(WHITE_ROOK);
+                case ChessPiece.PieceType.PAWN  -> System.out.print(WHITE_PAWN);
             }
-            else if (color == ChessGame.TeamColor.BLACK) {
-                switch (type) {
-                    case ChessPiece.PieceType.QUEEN -> System.out.print(BLACK_QUEEN);
-                    case ChessPiece.PieceType.KING -> System.out.print(BLACK_KING);
-                    case ChessPiece.PieceType.BISHOP -> System.out.print(BLACK_BISHOP);
-                    case ChessPiece.PieceType.KNIGHT -> System.out.print(BLACK_KNIGHT);
-                    case ChessPiece.PieceType.ROOK -> System.out.print(BLACK_ROOK);
-                    case ChessPiece.PieceType.PAWN -> System.out.print(BLACK_PAWN);
-                }
+        }
+        else if (color == ChessGame.TeamColor.BLACK) {
+            switch (type) {
+                case ChessPiece.PieceType.QUEEN -> System.out.print(BLACK_QUEEN);
+                case ChessPiece.PieceType.KING -> System.out.print(BLACK_KING);
+                case ChessPiece.PieceType.BISHOP -> System.out.print(BLACK_BISHOP);
+                case ChessPiece.PieceType.KNIGHT -> System.out.print(BLACK_KNIGHT);
+                case ChessPiece.PieceType.ROOK -> System.out.print(BLACK_ROOK);
+                case ChessPiece.PieceType.PAWN -> System.out.print(BLACK_PAWN);
             }
         }
     }

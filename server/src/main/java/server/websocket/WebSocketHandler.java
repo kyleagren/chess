@@ -20,7 +20,6 @@ import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.Notification;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 
 @WebSocket
@@ -106,14 +105,10 @@ public class WebSocketHandler {
             return;
         }
         if (username.equals(game.whiteUsername())) {
-            ChessGame chessGame = game.game();
-            chessGame.setGameOver(true);
-            newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+            newGame = checkGameOver(game, gameID);
         }
         else if (username.equals(game.blackUsername())) {
-            ChessGame chessGame = game.game();
-            chessGame.setGameOver(true);
-            newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+            newGame = checkGameOver(game, gameID);
         }
         else {
             // observer shouldn't be able to resign
@@ -129,6 +124,12 @@ public class WebSocketHandler {
         connections.sendToAll(username, notification);
     }
 
+    private GameData checkGameOver(GameData game, int gameID) {
+        ChessGame chessGame = game.game();
+        chessGame.setGameOver(true);
+        return new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+    }
+
     private void makeMove(String username, ChessMove move, int gameID)
             throws DataAccessException, IOException {
         GameData game = gameService.getGame(gameID);
@@ -138,58 +139,17 @@ public class WebSocketHandler {
             return;
         }
         if (username.equals(game.whiteUsername())) {
-            ChessGame chessGame = game.game();
-            if (chessGame.getTeamTurn() != ChessGame.TeamColor.WHITE) {
-                connections.send(username, new Gson().toJson(new ErrorMessage("Error: It's not your turn")));
-                return;
-            }
-            var validMoves = chessGame.validMoves(move.getStartPosition());
-            if (validMoves == null) {
-                connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
-                return;
-            }
-            else if (validMoves.contains(move)) {
-                try {
-                    chessGame.makeMove(move);
-                } catch (InvalidMoveException ex) {
-                    connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
-                    return;
-                }
-            }
-            else {
-                connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
-                return;
-            }
-            newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+            newGame = checkMoveValidity(username, game, ChessGame.TeamColor.WHITE, move);
         }
         else if (username.equals(game.blackUsername())) {
-            ChessGame chessGame = game.game();
-            if (chessGame.getTeamTurn() != ChessGame.TeamColor.BLACK) {
-                connections.send(username, new Gson().toJson(new ErrorMessage("Error: It's not your turn")));
-                return;
-            }
-            var validMoves = chessGame.validMoves(move.getStartPosition());
-            if (validMoves == null) {
-                connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
-                return;
-            }
-            else if (validMoves.contains(move)) {
-                try {
-                    chessGame.makeMove(move);
-                } catch (InvalidMoveException ex) {
-                    connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
-                    return;
-                }
-            }
-            else {
-                connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
-                return;
-            }
-            newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+            newGame = checkMoveValidity(username, game, ChessGame.TeamColor.BLACK, move);
         }
         else {
             // Observers shouldn't be able to make moves
             connections.send(username, new Gson().toJson(new ErrorMessage("Error: Observers can't make moves.")));
+            return;
+        }
+        if (newGame == null) {
             return;
         }
         gameService.updateGame(gameID, newGame);
@@ -233,5 +193,32 @@ public class WebSocketHandler {
             return authData.username();
         }
         return null;
+    }
+
+    private GameData checkMoveValidity(String username, GameData game,
+                                       ChessGame.TeamColor color, ChessMove move) throws IOException {
+        ChessGame chessGame = game.game();
+        if (chessGame.getTeamTurn() != color) {
+            connections.send(username, new Gson().toJson(new ErrorMessage("Error: It's not your turn")));
+            return null;
+        }
+        var validMoves = chessGame.validMoves(move.getStartPosition());
+        if (validMoves == null) {
+            connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
+            return null;
+        }
+        else if (validMoves.contains(move)) {
+            try {
+                chessGame.makeMove(move);
+            } catch (InvalidMoveException ex) {
+                connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
+                return null;
+            }
+        }
+        else {
+            connections.send(username, new Gson().toJson(new ErrorMessage("Error: Invalid move")));
+            return null;
+        }
+        return new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
     }
 }

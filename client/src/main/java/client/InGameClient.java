@@ -41,7 +41,7 @@ public class InGameClient extends ChessClient {
             ws.joinGame(token, gameNumber);
         }
         else {
-            ws.observeGame(token, gameNumber);
+            ws.joinGame(token, gameNumber);
         }
     }
 
@@ -60,7 +60,6 @@ public class InGameClient extends ChessClient {
                 default -> help();
             };
         } catch (Exception e) {
-            // TODO - for Phase 6 this probably needs to be a ResponseException.
             return "Something went wrong. Error: " + e.getMessage();
         }
     }
